@@ -1,29 +1,28 @@
 import { defineType, defineField, defineArrayMember } from 'sanity';
 import { MenuIcon } from '@sanity/icons';
 
-// Navigation menu — deterministic _id: menu-<wpTermTaxonomyId>. 2 nav menus in source
-// ("top level menu" -> categories, "social" -> custom links).
+// Navigation menu — deterministic _id: menu-<wpTermId>. "primary" drives the header navigation,
+// "social" the social links.
 const menuItem = defineArrayMember({
   type: 'object',
   name: 'menuItem',
   fields: [
     defineField({ name: 'label', title: 'Label', type: 'string' }),
-    defineField({ name: 'type', title: 'Type', type: 'string', options: { list: ['category', 'post', 'page', 'custom', 'internal'] } }),
-    defineField({ name: 'url', title: 'URL', type: 'string' }),
-    defineField({ name: 'ref', title: 'Reference', type: 'reference', weak: true, to: [{ type: 'category' }, { type: 'post' }, { type: 'page' }] }),
+    defineField({ name: 'ref', title: 'Internal target', type: 'reference', weak: true, to: [{ type: 'category' }, { type: 'page' }, { type: 'post' }, { type: 'tag' }] }),
+    defineField({ name: 'url', title: 'External / custom URL', type: 'string' }),
   ],
   preview: { select: { title: 'label', subtitle: 'url' } },
 });
 
 export const menu = defineType({
   name: 'menu',
-  title: 'Navigation Menu',
+  title: 'Navigation menu',
   type: 'document',
   icon: MenuIcon,
   fields: [
     defineField({ name: 'title', title: 'Title', type: 'string', validation: (r) => r.required() }),
-    defineField({ name: 'slug', title: 'Slug', type: 'slug', options: { source: 'title' } }),
-    defineField({ name: 'wpTermTaxonomyId', title: 'WP Term Taxonomy ID', type: 'number' }),
+    defineField({ name: 'location', title: 'Location', type: 'string', options: { list: ['primary', 'social', 'footer'] } }),
     defineField({ name: 'items', title: 'Items', type: 'array', of: [menuItem] }),
   ],
+  preview: { select: { title: 'title', subtitle: 'location' } },
 });

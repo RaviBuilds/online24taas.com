@@ -1,21 +1,25 @@
 import { defineType, defineField } from 'sanity';
 import { ImageIcon } from '@sanity/icons';
 
-// Media asset wrapper — deterministic _id: asset-<wpAttachmentId>. 799 attachments in source.
-// Uploads happen in Phase 3; schema exists now so references resolve. Keeps WP provenance + alt/caption.
+// Media record — deterministic _id: mediaAsset-<wpAttachmentId>. One per WordPress attachment (799).
+// Holds provenance and metadata next to the binary (image or file asset).
 export const mediaAsset = defineType({
   name: 'mediaAsset',
-  title: 'Media Asset',
+  title: 'Media (WordPress attachment)',
   type: 'document',
   icon: ImageIcon,
   fields: [
     defineField({ name: 'title', title: 'Title', type: 'string' }),
     defineField({ name: 'image', title: 'Image', type: 'image', options: { hotspot: true } }),
     defineField({ name: 'file', title: 'File (non-image)', type: 'file' }),
-    defineField({ name: 'alt', title: 'Alt Text', type: 'string' }),
-    defineField({ name: 'caption', title: 'Caption', type: 'text' }),
-    defineField({ name: 'originalPath', title: 'Original Upload Path', type: 'string', description: 'e.g. 2022/09/home.jpg under wp-content/uploads' }),
-    defineField({ name: 'sourceUrl', title: 'Source URL', type: 'url' }),
-    defineField({ name: 'wpAttachmentId', title: 'WordPress Attachment ID', type: 'number' }),
+    defineField({ name: 'alt', title: 'Alt text', type: 'string' }),
+    defineField({ name: 'caption', title: 'Caption', type: 'text', rows: 2 }),
+    defineField({ name: 'description', title: 'Description', type: 'text', rows: 2 }),
+    defineField({ name: 'mimeType', title: 'MIME type', type: 'string', readOnly: true }),
+    defineField({ name: 'wpAttachmentId', title: 'WordPress attachment ID', type: 'number', readOnly: true }),
+    defineField({ name: 'wpParentId', title: 'Attached to WordPress post ID', type: 'number', readOnly: true }),
+    defineField({ name: 'originalPath', title: 'Original upload path', type: 'string', readOnly: true }),
+    defineField({ name: 'legacyUrl', title: 'Legacy URL', type: 'url', readOnly: true }),
   ],
+  preview: { select: { title: 'title', subtitle: 'originalPath', media: 'image' } },
 });

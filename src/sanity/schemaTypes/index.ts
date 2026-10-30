@@ -7,21 +7,11 @@ import { page } from './documents/page';
 import { mediaAsset } from './documents/mediaAsset';
 import { menu } from './documents/menu';
 import { redirect } from './documents/redirect';
+import { siteSettings } from './documents/siteSettings';
 import { seo } from './objects/seo';
 import { blockContent, rawHtml } from './blocks/blockContent';
 
 export const schemaTypes: SchemaTypeDefinition[] = [
-  // documents
-  author,
-  category,
-  tag,
-  post,
-  page,
-  mediaAsset,
-  menu,
-  redirect,
-  // objects / blocks
-  seo,
-  blockContent,
-  rawHtml,
+  post, page, category, tag, author, mediaAsset, menu, redirect, siteSettings,
+  seo, blockContent, rawHtml,
 ];
