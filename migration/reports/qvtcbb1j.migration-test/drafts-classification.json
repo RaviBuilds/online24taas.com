@@ -1,0 +1,162 @@
+[
+  {
+    "id": 83,
+    "status": "draft",
+    "bucket": "recoverable-draft-with-content",
+    "importAs": "sanity-draft",
+    "bodyChars": 3503,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 87,
+    "status": "draft",
+    "bucket": "draft-title-only",
+    "importAs": "sanity-draft",
+    "bodyChars": 106,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 88,
+    "status": "draft",
+    "bucket": "recoverable-draft-with-content",
+    "importAs": "sanity-draft",
+    "bodyChars": 1185,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 96,
+    "status": "draft",
+    "bucket": "recoverable-draft-with-content",
+    "importAs": "sanity-draft",
+    "bodyChars": 2642,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 98,
+    "status": "draft",
+    "bucket": "draft-title-only",
+    "importAs": "sanity-draft",
+    "bodyChars": 0,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 151,
+    "status": "draft",
+    "bucket": "recoverable-draft-with-content",
+    "importAs": "sanity-draft",
+    "bodyChars": 3061,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 172,
+    "status": "draft",
+    "bucket": "recoverable-draft-with-content",
+    "importAs": "sanity-draft",
+    "bodyChars": 1215,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 182,
+    "status": "draft",
+    "bucket": "draft-empty",
+    "importAs": "sanity-draft",
+    "bodyChars": 41,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 296,
+    "status": "draft",
+    "bucket": "draft-title-only",
+    "importAs": "sanity-draft",
+    "bodyChars": 0,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 389,
+    "status": "draft",
+    "bucket": "recoverable-draft-with-content",
+    "importAs": "sanity-draft",
+    "bodyChars": 1319,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 758,
+    "status": "draft",
+    "bucket": "recoverable-draft-with-content",
+    "importAs": "sanity-draft",
+    "bodyChars": 1528,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 1200,
+    "status": "draft",
+    "bucket": "recoverable-draft-with-content",
+    "importAs": "sanity-draft",
+    "bodyChars": 1875,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 1237,
+    "status": "draft",
+    "bucket": "recoverable-draft-with-content",
+    "importAs": "sanity-draft",
+    "bodyChars": 4629,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 1483,
+    "status": "draft",
+    "bucket": "draft-title-only",
+    "importAs": "sanity-draft",
+    "bodyChars": 0,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 1484,
+    "status": "draft",
+    "bucket": "draft-title-only",
+    "importAs": "sanity-draft",
+    "bodyChars": 0,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 1551,
+    "status": "draft",
+    "bucket": "draft-title-only",
+    "importAs": "sanity-draft",
+    "bodyChars": 0,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 1717,
+    "status": "draft",
+    "bucket": "draft-title-only",
+    "importAs": "sanity-draft",
+    "bodyChars": 0,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 2498,
+    "status": "draft",
+    "bucket": "draft-title-only",
+    "importAs": "sanity-draft",
+    "bodyChars": 0,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 2702,
+    "status": "draft",
+    "bucket": "recoverable-draft-with-content",
+    "importAs": "sanity-draft",
+    "bodyChars": 2728,
+    "hasFeaturedImage": false
+  },
+  {
+    "id": 2723,
+    "status": "auto-draft",
+    "bucket": "auto-draft-archive-only",
+    "importAs": "archive-only",
+    "bodyChars": 0,
+    "hasFeaturedImage": false
+  }
+]

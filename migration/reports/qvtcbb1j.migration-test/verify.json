@@ -1,0 +1,38 @@
+{
+  "target": "qvtcbb1j.migration-test",
+  "subset": false,
+  "checkedAt": "2026-10-30T08:40:09.068Z",
+  "counts": {
+    "remoteByType": {
+      "author": 1,
+      "category": 14,
+      "post:draft": 19,
+      "mediaAsset": 799,
+      "menu": 2,
+      "page": 5,
+      "post": 660,
+      "siteSettings": 1,
+      "tag": 89
+    }
+  },
+  "checks": {
+    "manifestEntries": {
+      "expected": 1590,
+      "present": 1590
+    },
+    "assetRefs": {
+      "referenced": 697,
+      "resolved": 697
+    },
+    "danglingStrongRefs": 0,
+    "content": {
+      "checked": 684,
+      "bodyTextEqualsSource": 684,
+      "imageLedChecked": 437
+    },
+    "duplicates": 0,
+    "unicodeIssues": 0
+  },
+  "failures": [],
+  "ok": true
+}
