@@ -19,7 +19,8 @@ const DECORATORS = {
   sup: 'sup', sub: 'sub',
 };
 const HEADINGS = { h1: 'h1', h2: 'h2', h3: 'h3', h4: 'h4', h5: 'h5', h6: 'h6' };
-const WP_COLOR_CLASS = /has-([a-z0-9-]+)-color/;
+// has-inline-color is WordPress's marker class; the palette name is the other has-<name>-color class
+const WP_COLOR_CLASS = /(?:^|\s)has-(?!inline-)([a-z0-9-]+)-color(?=\s|$)/;
 const SKIP_ELEMENTS = new Set(['script', 'style', 'noscript', 'template']);
 
 const attr = (el, name) => el.attrs?.find((a) => a.name === name)?.value;

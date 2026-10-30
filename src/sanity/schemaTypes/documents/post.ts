@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { defineType, defineField, defineArrayMember } from 'sanity';
 import { DocumentTextIcon } from '@sanity/icons';
 import { seoFields } from '../objects/seo';
@@ -70,6 +71,6 @@ export const post = defineType({
   ],
   preview: {
     select: { title: 'title', subtitle: 'publishedAt', media: 'featuredImage' },
-    prepare: ({ title, subtitle, media }: { title?: string; subtitle?: string; media?: unknown }) => ({ title, subtitle: subtitle?.slice(0, 10), media }),
+    prepare: ({ title, subtitle, media }: { title?: string; subtitle?: string; media?: any }) => ({ title, subtitle: subtitle?.slice(0, 10), media }),
   },
 });
