@@ -1,0 +1,111 @@
+{
+  "target": "mkiaioc7.production",
+  "checkedAt": "2026-10-30T20:12:01.671Z",
+  "sections": {
+    "publishedPosts": {
+      "expected": 660,
+      "found": 660,
+      "ok": true
+    },
+    "pages": {
+      "expected": 5,
+      "found": 5,
+      "ok": true
+    },
+    "recoverableDrafts": {
+      "expected": 19,
+      "found": 19,
+      "ok": true
+    },
+    "autoDraftsPublishedOrDrafted": {
+      "expected": 0,
+      "found": 0,
+      "ok": true
+    },
+    "categories": {
+      "expected": 14,
+      "found": 14,
+      "ok": true
+    },
+    "tags": {
+      "expected": 89,
+      "found": 89,
+      "ok": true
+    },
+    "authors": {
+      "expected": 1,
+      "found": 1,
+      "ok": true
+    },
+    "attachmentRecords": {
+      "expected": 799,
+      "found": 799,
+      "ok": true
+    },
+    "distinctUnderlyingAssets": {
+      "expected": 697,
+      "found": 697,
+      "ok": true
+    },
+    "duplicateWpPostIds": {
+      "expected": 0,
+      "found": 0,
+      "ok": true
+    },
+    "duplicateSlugsAmongPublished": {
+      "expected": 0,
+      "found": 0,
+      "ok": true
+    },
+    "danglingReferences": {
+      "expected": 0,
+      "found": 0,
+      "ok": true
+    },
+    "imageLedPosts": {
+      "expected": 437,
+      "found": 437,
+      "ok": true
+    },
+    "imageLedPostsWithFeaturedImageInSanity": {
+      "expected": 437,
+      "found": 437,
+      "ok": true
+    },
+    "publishedPostsWithoutBodyBlocks(437 empty + 4 placeholder-only)": {
+      "expected": 441,
+      "found": 441,
+      "ok": true
+    },
+    "placeholderOnlyPosts(gutenberg source, no body blocks)": {
+      "expected": 4,
+      "found": 4,
+      "ok": true
+    },
+    "bodylessPostsMissingFeaturedImage": {
+      "expected": 0,
+      "found": 0,
+      "ok": true
+    },
+    "commentsInDataset": {
+      "expected": 0,
+      "found": 0,
+      "ok": true
+    }
+  },
+  "mismatches": [],
+  "placeholderOnlyPostIds": [
+    245,
+    269,
+    854,
+    1119
+  ],
+  "excludedByPolicy": {
+    "revisions": 806,
+    "unapprovedComments": 1082,
+    "autoDraftIds": [
+      2723
+    ]
+  },
+  "ok": true
+}

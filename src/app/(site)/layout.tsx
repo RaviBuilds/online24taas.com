@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import { Noto_Sans_Devanagari, Roboto } from 'next/font/google';
+import localFont from 'next/font/local';
 import '../globals.css';
 import Script from 'next/script';
 import { Header } from '@/components/Header';
@@ -11,8 +11,30 @@ import { SITE_NAME, SITE_TAGLINE, SITE_URL } from '@/lib/site';
 
 // Marathi-first typography: Noto Sans Devanagari covers matras/conjuncts with correct metrics;
 // Roboto is only used for Latin text and digits that fall outside the Devanagari subset.
-const devanagari = Noto_Sans_Devanagari({ subsets: ['devanagari', 'latin'], weight: ['400', '500', '600', '700'], display: 'swap', variable: '--font-devanagari' });
-const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'], display: 'swap', variable: '--font-roboto' });
+// Fonts are self-hosted (src/fonts) so builds never depend on fonts.googleapis.com.
+// Variable fonts (weights 100-900). Separate families per script because next/font/local has no per-file
+// unicode-range; the CSS font stack falls through per glyph: Latin file -> Devanagari file -> Roboto.
+const devanagari = localFont({
+  src: '../../fonts/noto-sans-devanagari-devanagari-wght-normal.woff2',
+  weight: '100 900',
+  display: 'swap',
+  variable: '--font-devanagari',
+});
+const devanagariLatin = localFont({
+  src: '../../fonts/noto-sans-devanagari-latin-wght-normal.woff2',
+  weight: '100 900',
+  display: 'swap',
+  variable: '--font-devanagari-latin',
+});
+const roboto = localFont({
+  src: [
+    { path: '../../fonts/roboto-latin-400-normal.woff2', weight: '400', style: 'normal' },
+    { path: '../../fonts/roboto-latin-500-normal.woff2', weight: '500', style: 'normal' },
+    { path: '../../fonts/roboto-latin-700-normal.woff2', weight: '700', style: 'normal' },
+  ],
+  display: 'swap',
+  variable: '--font-roboto',
+});
 
 const baseMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -40,7 +62,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   // AdSense only on the real production deployment (never previews / local), as before in WordPress.
   const showAds = !!adsId && process.env.VERCEL_ENV === 'production';
   return (
-    <html lang="mr" className={`${devanagari.variable} ${roboto.variable}`}>
+    <html lang="mr" className={`${devanagariLatin.variable} ${devanagari.variable} ${roboto.variable}`}>
       <body>
         <a href="#content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-3">मुख्य मजकुराकडे जा</a>
         <Header site={site} />

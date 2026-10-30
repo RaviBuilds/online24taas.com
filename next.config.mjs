@@ -7,6 +7,8 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Opt-in separate output dir so a production build can run next to `next dev` (which also writes to .next).
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   images: {
     loader: 'custom',
     loaderFile: './src/sanity/lib/imageLoader.ts',

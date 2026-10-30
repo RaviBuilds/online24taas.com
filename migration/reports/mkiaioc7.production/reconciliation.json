@@ -1,0 +1,178 @@
+{
+  "generatedFrom": "migration/work/raw (APP-DATA.SQL)",
+  "wpPostsRows": 2308,
+  "classifiedIds": 2308,
+  "unclassified": 0,
+  "buckets": {
+    "post:publish": 660,
+    "page:publish": 5,
+    "post:draft": 20,
+    "attachment": 799,
+    "revision": 806,
+    "nav_menu_item": 12,
+    "other-system": 6
+  },
+  "otherSystemPosts": [
+    {
+      "id": 7,
+      "type": "wpcf7_contact_form",
+      "status": "publish",
+      "title": "Contact form 1"
+    },
+    {
+      "id": 11,
+      "type": "wp_global_styles",
+      "status": "publish",
+      "title": "Custom Styles"
+    },
+    {
+      "id": 45,
+      "type": "elementor_library",
+      "status": "publish",
+      "title": "Default Kit"
+    },
+    {
+      "id": 137,
+      "type": "custom_css",
+      "status": "publish",
+      "title": "adore-news"
+    },
+    {
+      "id": 350,
+      "type": "wpcode",
+      "status": "draft",
+      "title": "Display a message after the 1st paragraph of posts"
+    },
+    {
+      "id": 351,
+      "type": "wpcode",
+      "status": "draft",
+      "title": "Completely Disable Comments"
+    }
+  ],
+  "publishedPosts": 660,
+  "publishedPages": 5,
+  "imageLedPosts": 437,
+  "emptyBodyPosts": 437,
+  "emptyBodyWithoutFeaturedImage": [],
+  "gutenbergPosts": 223,
+  "legacyHtmlPosts": 0,
+  "drafts": {
+    "recoverable-draft-with-content": 10,
+    "draft-title-only": 8,
+    "draft-empty": 1,
+    "auto-draft-archive-only": 1
+  },
+  "categories": 14,
+  "tags": 89,
+  "authors": 1,
+  "attachments": 799,
+  "attachmentsWithLocalFile": 799,
+  "attachmentsMissingLocalFile": [],
+  "featuredImageDangling": [],
+  "revisions": 806,
+  "revisionsByParent": {
+    "post": 791,
+    "custom_css": 6,
+    "page": 9
+  },
+  "comments": {
+    "total": 1082,
+    "byApproved": {
+      "0": 1082
+    },
+    "byPostStatus": {
+      "post/publish": 1082
+    }
+  },
+  "menus": [
+    {
+      "id": 22,
+      "title": "top level menu",
+      "location": "primary",
+      "items": 8
+    },
+    {
+      "id": 59,
+      "title": "social",
+      "location": "social",
+      "items": 4
+    }
+  ],
+  "uploads": {
+    "totalFiles": 3734,
+    "knownAttachmentFiles": 3723,
+    "orphanFiles": 4,
+    "orphanBytes": 28813
+  },
+  "slugCollisions": [
+    {
+      "id": 302,
+      "slug": "चांगलं-काम-केल्यावर-स्वामी-देतात-साक्षात-दर्शन-फक्त-निष्ठा-302"
+    },
+    {
+      "id": 1140,
+      "slug": "भिऊ-नकोस-मी-तुझ्या-पाठीशी-आहे-1140"
+    },
+    {
+      "id": 1196,
+      "slug": "भिऊ-नकोस-मी-तुझ्या-पाठीशी-आहे-1196"
+    },
+    {
+      "id": 1231,
+      "slug": "भिऊ-नकोस-मी-तुझ्या-पाठीशी-आहे-1231"
+    },
+    {
+      "id": 2249,
+      "slug": "सदगुरूंची-मानसपूजा-कशी-करावी-सदगुरू-प्रसन्न-कसे-होतात-2249"
+    },
+    {
+      "id": 2698,
+      "slug": "भिऊ-नकोस-मी-तुझ्या-पाठीशी-आहे-2698"
+    },
+    {
+      "id": 88,
+      "slug": "आयुष्याचा-दृष्टीकोन-88"
+    },
+    {
+      "id": 96,
+      "slug": "घरातून-गरिबी-दूर-करण्याचा-जालीम-उपाय-96"
+    },
+    {
+      "id": 98,
+      "slug": "घरातून-गरिबी-दूर-करण्याचा-जालीम-उपाय-98"
+    },
+    {
+      "id": 151,
+      "slug": "सातबारा-पहा-आपल्या-मोबाईल-वर-151"
+    },
+    {
+      "id": 1237,
+      "slug": "दिवाळीचा-सण-मोठा-आनंदाला-नाही-तोटा-दिवाळीच्या-खरेदीसाठी-1237"
+    },
+    {
+      "id": 1483,
+      "slug": "श्री-स्वामी-समर्थ-1483"
+    },
+    {
+      "id": 1484,
+      "slug": "श्री-स्वामी-समर्थ-1484"
+    },
+    {
+      "id": 1551,
+      "slug": "श्री-स्वामी-समर्थ-1551"
+    },
+    {
+      "id": 1717,
+      "slug": "श्री-स्वामी-समर्थ-1717"
+    },
+    {
+      "id": 2498,
+      "slug": "श्री-स्वामी-समर्थ-2498"
+    },
+    {
+      "id": 2702,
+      "slug": "यादव-गवळी-समाजाने-नेहमीच-दिशादर्शक-म्हणून-काम-केले-अजय-2702"
+    }
+  ]
+}

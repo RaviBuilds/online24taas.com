@@ -1,0 +1,30 @@
+{
+  "totals": {
+    "documents": 240,
+    "rawHtmlBlocks": 3,
+    "imageBlocks": 284,
+    "unresolvedImages": 0,
+    "emptyImagePlaceholders": 7,
+    "colorMarks": 127
+  },
+  "rawHtml": [
+    {
+      "wpId": 675,
+      "reason": "unsupported:iframe",
+      "tag": "iframe"
+    },
+    {
+      "wpId": 675,
+      "reason": "unsupported:iframe",
+      "tag": "iframe"
+    },
+    {
+      "wpId": 675,
+      "reason": "unsupported:iframe",
+      "tag": "iframe"
+    }
+  ],
+  "droppedAttributes": {},
+  "alignedBlocks": {},
+  "unresolved": {}
+}

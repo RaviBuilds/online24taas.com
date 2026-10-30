@@ -36,7 +36,7 @@ node migration/import.mjs --project P --dataset D --use-cli-auth [--batch-size 2
 ```
 Per document: missing → create; identical → skip; unchanged since our last write → update; edited by an
 editor or unknown → **conflict, skipped and reported**. `--adopt-matching` lets the importer take over
-documents seeded earlier that carry the same `wp*` id (needed once for the 104 taxonomy docs in `mkiaioc7`).
+documents seeded earlier that carry the same `wp*` id (needed once for the 104 taxonomy docs in `mkiaioc7`; 31 of the 89 tags also had different names than WordPress, which the import corrects).
 `--force-update` overwrites regardless (use deliberately).
 
 ## 5. Verify against the live dataset
@@ -46,16 +46,25 @@ SANITY_TARGET_PROJECT=P SANITY_TARGET_DATASET=D SANITY_USE_CLI_AUTH=1 npm run te
 node migration/report.mjs --project P --dataset D       # refresh migration/reports/P.D/
 ```
 
-## 6. Production run for `mkiaioc7` / `production` (blocked until credentials exist)
-1. Back up: `npx sanity dataset export production backups/mkiaioc7-$(date +%F).tar.gz` (a public-view export from 2026-10-30 is already in `migration/work/backups/`).
-2. `node migration/upload-assets.mjs --project mkiaioc7 --dataset production --token …`
-3. `node migration/build-bundle.mjs --project mkiaioc7 --dataset production` → `validate-bundle`
-4. The failed Phase 2 left two stale drafts in `mkiaioc7` (`drafts.post-273`, `drafts.post-2551`). Discard them in Studio
-   (document menu → "Discard changes") before importing: the importer creates the *published* `post-273`/`post-2551`, and a leftover draft
-   would show as pending edits on top of it. They are never touched by the importer (its bundle only writes `post-273`, not `drafts.post-273`).
-   Then `import --dry-run --adopt-matching`: expect 0 conflicts (the 104 seeded taxonomy docs are adopted by `wp*` id and get corrected slugs: 77 of 103 had percent-encoded slugs).
-5. `import --adopt-matching`, then `verify` + `test:integration` + `report`.
-6. Publish: Studio shows imported WordPress *drafts* as drafts; published posts are already published (they are not drafts).
+## 6. Production run for `mkiaioc7` / `production` (EXECUTED 2026-10-30, verified 2026-10-31)
+Authenticated as `write2ravi14@gmail.com` (administrator). Steps as run, usable for a repeat:
+0. Identity: `npx sanity debug --secrets` (never paste the token), `npx sanity users list --project-id mkiaioc7`. The user ID shown by
+   `whoami` (`gnpi1yQhc`, global Sanity ID) differs from the ID in the project list (`pBcpBIFTg`, project-scoped member ID); the
+   project member record carries `sanityUserId: gnpi1yQhc` and the same e-mail, so they are one person. Write access: the project
+   permissions list includes `writeAll`, and a `dryRun=true` mutation is accepted.
+1. Back up (before any write): `npx sanity dataset export production <dir>/…tar.gz` plus an API export; record SHA-256 and a metadata file.
+   Stored in `~/Projects/freelancing/sanity-backups/mkiaioc7-production/`.
+2. `node migration/upload-assets.mjs --project mkiaioc7 --dataset production --use-cli-auth` (799 attachments → 697 distinct assets).
+3. `node migration/build-bundle.mjs --project mkiaioc7 --dataset production` → `validate-bundle`.
+4. Stale drafts `drafts.post-273`, `drafts.post-2551` were exported (`removed-stale-drafts.ndjson`), compared with the published posts, then deleted
+   with a revision check. Never delete such drafts without saving them first.
+5. `import --dry-run --adopt-matching`, then `import --adopt-matching`: 1,486 created, 103 updated, 1 unchanged, 0 conflicts, 0 failures.
+6. `node migration/verify.mjs …`, `node migration/reconcile-live.mjs …`, `npm run test:integration`, `node migration/report.mjs …`.
+Published posts are already published; WordPress drafts appear as drafts in Studio.
 
 ## Re-running after content edits
 Safe at any time: edited documents are reported as conflicts and left untouched.
+
+## Builds
+Fonts are self-hosted in `src/fonts` (`next/font/local`), so `next build` needs no access to Google. Do not switch back to `next/font/google`:
+a font fetch hang failed a build and the compile step took 7+ minutes.

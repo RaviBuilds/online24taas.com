@@ -33,5 +33,26 @@ Times are 2026-10-30 (IST) unless stated. Sensitive values are never logged.
 - Studio: opened with an injected Admin token; created a Marathi post with Devanagari slug and bold text, draft stayed private, publish worked, editing a published doc created a separate draft; test documents deleted afterwards (679 posts remain = 660 + 19). One earlier aborted run left a draft that was removed by title+no-`wpPostId` match.
 - Added CORS origin `http://localhost:3100` and a Viewer token (`online24taas-migration-test-read`) to `qvtcbb1j`.
 
-## Not done (blocked)
-Production write to `mkiaioc7`, production dataset export (a public-view export was saved), Vercel preview, DNS.
+## Production migration `mkiaioc7` / `production` (executed 2026-10-30 ~19:17-19:35 IST; recorded and re-verified 2026-10-31)
+This was done in an earlier session and not logged at the time. Evidence is in `migration/work/logs/`, `migration/work/state/mkiaioc7.production/`,
+the backup folder and `migration/reports/mkiaioc7.production/`. Re-verified against the live dataset on 2026-10-31 rather than trusted.
+- **Identity**: `sanity debug`: Google login `write2ravi14@gmail.com`, role administrator, project `mkiaioc7` "online24taas". `whoami` ID `gnpi1yQhc` is the
+  global user ID; the project list shows the project member ID `pBcpBIFTg`, whose record has `sanityUserId: gnpi1yQhc` and the same e-mail: same person, different ID types.
+  Membership checked by e-mail via the project member API. Project permissions include `writeAll`; a `dryRun` create mutation was accepted (nothing written).
+  Only dataset: `production`. `.env.local` points to `mkiaioc7/production`; `qvtcbb1j` appears only in `.env.rehearsal.local` and in the rehearsal reports.
+- **Backup** (before any write): `~/Projects/freelancing/sanity-backups/mkiaioc7-production/`: `…-20261030T134743Z.tar.gz` (106 documents: 89 tags, 14 categories, 2 posts, 1 author; 14 image files)
+  and `…-api-export.ndjson` (132 documents incl. system docs); `BACKUP_METADATA.json` records time, project, dataset, account e-mail; `SHA256SUMS` re-checked OK.
+- **Seeded data**: of 104 taxonomy docs, 70 had percent-encoded slugs; 31 tags had names different from the WordPress term with the same ID. Importer adopted them by `wp*` ID and corrected them (WordPress is the source of truth).
+- **Stale drafts**: `drafts.post-273` (empty body, same title/slug/author/category/tags/featured image as the migrated post) and `drafts.post-2551` (body = single word "placeholder", title "placeholder", slug "test") were saved to `removed-stale-drafts.ndjson`, then deleted with a revision check. Published `post-273` and `post-2551` carry the full WordPress content. 0 drafts shadow a published document.
+- **Assets**: 799 uploads, 0 failed, 697 distinct Sanity assets; WordPress attachment ID to asset mapping in `migration/work/state/mkiaioc7.production/assets.json` and per-document in the manifest.
+- **Import**: 1,590 documents; created 1,486, updated 103, unchanged 1, conflicts 0, failed 0, retries 0; dry-run re-run: 1,590 unchanged.
+- **Verification (2026-10-31)**: `verify` OK (1,590/1,590, 697/697 assets, 0 dangling, 684/684 bodies, 437 image-led, 0 duplicates, 0 Unicode issues); `reconcile-live` OK (0 mismatches: counts, slugs, dates, authors, categories, tags, featured images, SEO); `test:integration` 10/10.
+- **Frontend**: `npm run check` (typecheck, lint, 67 unit tests, build) passes. Playwright against a `next start` of the production build: 28 passed, 1 skipped (opt-in Studio test).
+- **Issues found and fixed on 2026-10-31**
+  - Lint reported 36k problems from a stale `.next-e2e/` build output: added `.next-*/**` to the ESLint ignores.
+  - Build took 7+ min and once failed (`socket hang up`) fetching Google Fonts: fonts are now self-hosted (`src/fonts`, `next/font/local`; Noto Sans Devanagari variable + Roboto 400/500/700, OFL/Apache licences included). Build: 79-114 s compile.
+  - E2E "category archive paginates" failed under 3 parallel workers (reproduced 3 times; passes alone). Cause: a click on a page link while Next's prefetch of the same URL was in flight was dropped (confirmed: blocking prefetch requests made the click work first time). Fix: `prefetch={false}` on pagination links. Full suite then passed.
+- **Not possible here**: Vercel (no CLI/login), SMTP (no credentials), Studio image upload through the UI.
+
+## Not done
+Vercel preview deployment, deployed-origin CORS/webhook, SMTP, `ads.txt`, DNS, credential rotation. See `MIGRATION_STATUS.md`.

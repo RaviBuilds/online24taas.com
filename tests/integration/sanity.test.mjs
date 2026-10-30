@@ -93,8 +93,11 @@ test('Marathi Unicode is intact in titles', { skip }, async () => {
 
 test('uploaded assets carry the WordPress attachment id', { skip }, async () => {
   // 799 attachments, but identical binaries are stored once by Sanity (content-addressed), so fewer assets.
-  const total = await q('count(*[_type=="sanity.imageAsset"])');
-  const withSource = await q('count(*[_type=="sanity.imageAsset" && source.name=="wordpress" && defined(source.id)])');
+  // Only assets referenced by migrated mediaAsset documents are checked: a production dataset may also hold
+  // unreferenced assets from earlier experiments, which the migration never touches (listed in the reports).
+  const used = await q('array::unique(*[_type=="mediaAsset" && defined(image.asset._ref)].image.asset._ref)');
+  const total = await q('count(*[_type=="sanity.imageAsset" && _id in $ids])', { ids: used });
+  const withSource = await q('count(*[_type=="sanity.imageAsset" && _id in $ids && source.name=="wordpress" && defined(source.id)])', { ids: used });
   assert.equal(withSource, total);
   assert.ok(total >= 650 && total <= 799, `image assets: ${total}`);
 });
