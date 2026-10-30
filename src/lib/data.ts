@@ -15,7 +15,7 @@ export interface PostCardData {
   authorName?: string | null;
 }
 export interface SiteData {
-  settings: { title?: string; tagline?: string; adsensePublisherId?: string; footerText?: string; socialLinks?: { label: string; url: string }[]; logoRef?: string } | null;
+  settings: { title?: string; tagline?: string; adsensePublisherId?: string; footerText?: string; socialLinks?: { label: string; url: string }[]; logoRef?: string; faviconRef?: string } | null;
   menu: { items?: { label?: string; url?: string; target?: { _type: string; title?: string; slug?: string } | null }[] } | null;
   pages: { title: string; slug: string }[];
   categories: { title: string; slug: string; count: number }[];
@@ -32,4 +32,11 @@ export const totalPages = (total: number) => Math.max(1, Math.ceil(total / POSTS
 export function parsePage(value: unknown): number {
   const n = Number.parseInt(String(value ?? '1'), 10);
   return Number.isFinite(n) && n >= 1 && n < 10000 ? n : 1;
+}
+
+/** Strict variant for /page/[n] routes: anything that is not a sane positive integer is a 404, never "page 1". */
+export function parsePageStrict(value: string): number | null {
+  if (!/^\d{1,4}$/.test(value)) return null;
+  const n = Number(value);
+  return n >= 1 ? n : null;
 }

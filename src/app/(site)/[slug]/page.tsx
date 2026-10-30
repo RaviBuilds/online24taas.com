@@ -8,6 +8,10 @@ import { PortableTextRenderer } from '@/components/PortableTextRenderer';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 
 export const revalidate = 300;
+// ISR: render on first request, then cache and refresh in the background / on Sanity webhook.
+export async function generateStaticParams() {
+  return [];
+}
 type Props = { params: Promise<{ slug: string }> };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PageData = { title: string; slug: string; body?: any[]; seo?: { seoTitle?: string; metaDescription?: string; canonicalUrl?: string; noIndex?: boolean } } | null;

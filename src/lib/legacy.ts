@@ -1,19 +1,19 @@
 // Pure routing logic for legacy WordPress URLs (no framework imports, so it is unit-testable in Node).
 export type LegacyAction =
-  | { type: 'rewrite'; params: Record<string, string> }
+  | { type: 'rewrite'; kind: 'post' | 'category' | 'tag' | 'search' | 'author' | 'media'; value: string }
   | { type: 'redirect'; to: string }
   | null;
 
 export function resolveLegacy(pathname: string, search: URLSearchParams): LegacyAction {
   if (pathname === '/') {
     const p = search.get('p') ?? search.get('page_id');
-    if (p) return { type: 'rewrite', params: { kind: 'post', id: p } };
+    if (p) return { type: 'rewrite', kind: 'post', value: p };
     const cat = search.get('cat');
-    if (cat) return { type: 'rewrite', params: { kind: 'category', id: cat } };
+    if (cat) return { type: 'rewrite', kind: 'category', value: cat };
     const tag = search.get('tag');
-    if (tag) return { type: 'rewrite', params: { kind: 'tag', slug: tag } };
-    if (search.has('s')) return { type: 'rewrite', params: { kind: 'search', q: search.get('s') ?? '' } };
-    if (search.has('author')) return { type: 'rewrite', params: { kind: 'author' } };
+    if (tag) return { type: 'rewrite', kind: 'tag', value: tag };
+    if (search.has('s')) return { type: 'rewrite', kind: 'search', value: search.get('s') ?? '' };
+    if (search.has('author')) return { type: 'rewrite', kind: 'author', value: search.get('author') ?? '' };
     if (search.has('feed')) return { type: 'redirect', to: '/feed.xml' };
     return null;
   }
@@ -25,7 +25,7 @@ export function resolveLegacy(pathname: string, search: URLSearchParams): Legacy
     } catch {
       /* keep raw */
     }
-    return { type: 'rewrite', params: { kind: 'media', path } };
+    return { type: 'rewrite', kind: 'media', value: path };
   }
   return null;
 }

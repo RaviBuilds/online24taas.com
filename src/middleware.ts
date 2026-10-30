@@ -9,9 +9,11 @@ export function middleware(req: NextRequest) {
   if (!action) return NextResponse.next();
   if (action.type === 'redirect') return NextResponse.redirect(new URL(action.to, req.url), 301);
   const url = req.nextUrl.clone();
-  url.pathname = '/api/legacy';
+  // Parameters travel in the rewritten PATH (a rewritten route handler can still see the original
+  // query string, which made query-based hand-off unreliable).
+  const value = (action.value || '-').split('/').map(encodeURIComponent).join('/');
+  url.pathname = `/api/legacy/${action.kind}/${value}`;
   url.search = '';
-  Object.entries(action.params).forEach(([k, v]) => url.searchParams.set(k, v));
   return NextResponse.rewrite(url);
 }
 

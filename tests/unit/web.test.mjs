@@ -8,14 +8,14 @@ import { slugify } from '../../src/sanity/lib/slugify.ts';
 const L = (url) => { const u = new URL(url, 'https://x.test'); return resolveLegacy(u.pathname, u.searchParams); };
 
 test('legacy: /?p=ID is resolved by id (query string, which next.config redirects cannot do)', () => {
-  assert.deepEqual(L('/?p=273'), { type: 'rewrite', params: { kind: 'post', id: '273' } });
-  assert.deepEqual(L('/?page_id=315'), { type: 'rewrite', params: { kind: 'post', id: '315' } });
+  assert.deepEqual(L('/?p=273'), { type: 'rewrite', kind: 'post', value: '273' });
+  assert.deepEqual(L('/?page_id=315'), { type: 'rewrite', kind: 'post', value: '315' });
 });
 test('legacy: cat, tag, s, author', () => {
-  assert.deepEqual(L('/?cat=5'), { type: 'rewrite', params: { kind: 'category', id: '5' } });
-  assert.deepEqual(L('/?tag=foo'), { type: 'rewrite', params: { kind: 'tag', slug: 'foo' } });
-  assert.deepEqual(L('/?s=%E0%A4%AE%E0%A4%B0%E0%A4%BE%E0%A4%A0%E0%A5%80'), { type: 'rewrite', params: { kind: 'search', q: 'मराठी' } });
-  assert.deepEqual(L('/?author=1'), { type: 'rewrite', params: { kind: 'author' } });
+  assert.deepEqual(L('/?cat=5'), { type: 'rewrite', kind: 'category', value: '5' });
+  assert.deepEqual(L('/?tag=foo'), { type: 'rewrite', kind: 'tag', value: 'foo' });
+  assert.deepEqual(L('/?s=%E0%A4%AE%E0%A4%B0%E0%A4%BE%E0%A4%A0%E0%A5%80'), { type: 'rewrite', kind: 'search', value: 'मराठी' });
+  assert.deepEqual(L('/?author=1'), { type: 'rewrite', kind: 'author', value: '1' });
 });
 test('legacy: plain home, unrelated queries and new routes are untouched (no redirect loops)', () => {
   for (const u of ['/', '/?utm_source=x', '/blog/abc', '/category/x?p=1', '/search?q=a']) assert.equal(L(u), null, u);
@@ -23,7 +23,7 @@ test('legacy: plain home, unrelated queries and new routes are untouched (no red
 test('legacy: feeds redirect to /feed.xml, uploads go to the media resolver', () => {
   assert.deepEqual(L('/feed/'), { type: 'redirect', to: '/feed.xml' });
   assert.deepEqual(L('/?feed=rss2'), { type: 'redirect', to: '/feed.xml' });
-  assert.deepEqual(L('/wp-content/uploads/2024/10/a-300x200.jpg'), { type: 'rewrite', params: { kind: 'media', path: '2024/10/a-300x200.jpg' } });
+  assert.deepEqual(L('/wp-content/uploads/2024/10/a-300x200.jpg'), { type: 'rewrite', kind: 'media', value: '2024/10/a-300x200.jpg' });
 });
 
 test('search query building: prefix terms, operators neutralised, Devanagari kept', () => {

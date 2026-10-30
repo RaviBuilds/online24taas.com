@@ -16,7 +16,7 @@ export const POST_CARD = /* groq */ `{
 export const SITE_QUERY = /* groq */ `{
   "settings": *[_id == "siteSettings"][0]{
     title, tagline, adsensePublisherId, footerText, socialLinks[]{ label, url },
-    "logoRef": logo.asset._ref
+    "logoRef": logo.asset._ref, "faviconRef": favicon.asset._ref
   },
   "menu": *[_type == "menu" && location == "primary"][0]{
     items[]{ label, url, "target": ref->{ _type, title, "slug": slug.current } }

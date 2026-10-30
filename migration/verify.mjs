@@ -26,8 +26,6 @@ const report = { target: target.key, subset: !!args.subset, checkedAt: new Date(
 const posts = new Map(loadNormalized('posts').map((p) => [p.id, p]));
 const pages = new Map(loadNormalized('pages').map((p) => [p.id, p]));
 const drafts = new Map(loadNormalized('drafts').map((p) => [p.id, p]));
-const cats = new Map(loadNormalized('categories').map((c) => [c.id, c]));
-const tags = new Map(loadNormalized('tags').map((c) => [c.id, c]));
 
 // pull every document of the managed types in one pass
 const TYPES = ['post', 'page', 'category', 'tag', 'author', 'mediaAsset', 'menu', 'siteSettings'];

@@ -22,7 +22,6 @@ export function buildContext(data = {}) {
   const postById = new Map(posts.map((p) => [p.id, p]));
   const pageById = new Map(pages.map((p) => [p.id, p]));
   const catById = new Map(categories.map((c) => [c.id, c]));
-  const catBySlug = new Map(categories.flatMap((c) => [[c.sourceSlug, c], [c.slug, c]]));
   const tagBySlug = new Map(tags.flatMap((c) => [[c.sourceSlug, c], [c.slug, c]]));
 
   function uploadRel(src) {

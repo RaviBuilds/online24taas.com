@@ -24,7 +24,7 @@ export function Listing({ heading, intro, crumbs, posts, total, page, href, empt
     <div className="theme-wrapper py-6">
       <Breadcrumbs items={crumbs} />
       <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
-        <section>
+        <section data-listing>
           <h1 className="mb-1 text-2xl font-bold md:text-3xl">{heading}</h1>
           {intro && <p className="mb-2 text-neutral-700">{intro}</p>}
           <p className="mb-2 text-sm text-neutral-600">{total} लेख{page > 1 ? ` · पृष्ठ ${page}` : ''}</p>

@@ -6,6 +6,7 @@ import Script from 'next/script';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { getSite } from '@/lib/data';
+import { parseImageRef, sanityLoader } from '@/sanity/lib/image';
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from '@/lib/site';
 
 // Marathi-first typography: Noto Sans Devanagari covers matras/conjuncts with correct metrics;
@@ -13,7 +14,7 @@ import { SITE_NAME, SITE_TAGLINE, SITE_URL } from '@/lib/site';
 const devanagari = Noto_Sans_Devanagari({ subsets: ['devanagari', 'latin'], weight: ['400', '500', '600', '700'], display: 'swap', variable: '--font-devanagari' });
 const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'], display: 'swap', variable: '--font-roboto' });
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: `${SITE_NAME} - ${SITE_TAGLINE}`, template: `%s | ${SITE_NAME}` },
   description: SITE_TAGLINE,
@@ -21,6 +22,15 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image' },
   alternates: { types: { 'application/rss+xml': `${SITE_URL}/feed.xml` } },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  const ref = site.settings?.faviconRef;
+  const parsed = ref ? parseImageRef(ref) : null;
+  if (!parsed) return baseMetadata;
+  const icon = sanityLoader({ src: parsed.url, width: 96 });
+  return { ...baseMetadata, icons: { icon, apple: icon } };
+}
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#c80815' };
 

@@ -71,7 +71,6 @@ export function htmlToPortableText(content, ctx = {}) {
     const markDefs = [];
     const spans = [];
     const defKeyFor = new Map();
-    let spanCounter = 0;
     const push = (text, marks) => {
       if (!text) return;
       const last = spans[spans.length - 1];

@@ -17,6 +17,10 @@ import { Sidebar } from '@/components/Sidebar';
 import { MiniCard } from '@/components/PostCard';
 
 export const revalidate = 300;
+// ISR: render on first request, then cache and refresh in the background / on Sanity webhook.
+export async function generateStaticParams() {
+  return [];
+}
 type Props = { params: Promise<{ slug: string }> };
 
 interface Post {

@@ -8,6 +8,10 @@ import { categoryPath, decodeParam } from '@/lib/urls';
 import { buildMetadata } from '@/lib/seo';
 
 export const revalidate = 300;
+// ISR: render on first request, then cache and refresh in the background / on Sanity webhook.
+export async function generateStaticParams() {
+  return [];
+}
 type Props = { params: Promise<{ slug: string }> };
 type Data = { title: string; slug: string; description?: string; total: number; posts: PostCardData[] } | null;
 

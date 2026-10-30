@@ -26,7 +26,7 @@ const batchSize = Number(args['batch-size'] || 25);
 const MAX_TX_BYTES = 1_500_000;
 const dir = path.join(HERE, 'work/out', target.key + (args.subset ? '-subset' : ''));
 const sdir = stateDir(target);
-const statePath = path.join(sdir, args.subset ? 'import-subset.json' : 'import.json');
+const statePath = path.join(sdir, 'import.json');
 const logPath = path.join(sdir, 'import.log.ndjson');
 const state = readJson(statePath, { docs: {}, runs: [] });
 
