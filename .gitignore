@@ -1,0 +1,36 @@
+node_modules/
+.next/
+.env
+.env.local
+.env*.local
+*.tsbuildinfo
+next-env.d.ts
+.sanity/
+dist/
+
+# Secrets / credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*
+*.jpg.credentials
+
+# Raw WordPress sources and migration working files (never commit)
+*.sql
+*.SQL
+*.tar.gz
+*.crdownload
+migration/work/
+migration/out/
+migration/backups/
+migration/state/
+*.ndjson.bak
+
+# Tooling
+.vercel/
+playwright-report/
+test-results/
+coverage/
+.DS_Store

@@ -1,0 +1,31 @@
+import fs from 'node:fs';
+const base = '/tmp/online24taas-work/migration';
+function load(p){ return JSON.parse(fs.readFileSync(p,'utf8')); }
+let failures = 0;
+function check(name, cond, detail='') { const ok=!!cond; if(!ok) failures++; console.log(`  [${ok ? 'PASS' : 'FAIL'}] ${name}${detail?' :: '+detail:''}`); }
+const users = load(base+'/normalized/users.json');
+const terms = load(base+'/normalized/terms.json');
+const posts = load(base+'/intermediate/wp_posts.json');
+check('users.json exists', Array.isArray(users));
+check('terms.json exists', Array.isArray(terms));
+check('wp_posts.json exists', Array.isArray(posts));
+check('users count == 1', users.length === 1, 'n='+users.length);
+check('categories count 14', terms.filter(t=>t.taxonomy==='category').length === 14);
+check('tags count 89', terms.filter(t=>t.taxonomy==='tag').length === 89);
+check('published posts == 660', posts.filter(p=>p.post_status==='publish' && p.post_type==='post').length === 660);
+check('published pages == 5', posts.filter(p=>p.post_status==='publish' && p.post_type==='page').length === 5);
+check('drafts+auto-draft == 20', posts.filter(p=>p.post_type==='post' && p.post_status!=='publish').length === 20);
+check('attachments == 799', posts.filter(p=>p.post_type==='attachment').length === 799);
+check('revisions == 806', posts.filter(p=>p.post_type==='revision').length === 806);
+check('total rows == 2308', posts.length === 2308);
+const ids = [...users.map(u=>u._id), ...terms.map(t=>t._id), ...posts.map(p=>'post-'+p.ID)];
+check('no duplicate ids', new Set(ids).size === ids.length);
+check('all term slugs non-empty', terms.every(t=>t.slug && String(t.slug).trim().length>0));
+check('all user slugs non-empty', users.every(u=>u.slug && String(u.slug).trim().length>0));
+const pub = posts.filter(p=>p.post_status==='publish'&&p.post_type==='post');
+check('all published post slugs non-empty', pub.every(p=>p.decodedSlug && String(p.decodedSlug).trim().length>0));
+check('all published posts have author id', pub.every(p=>p.post_author != null));
+const attIds = new Set(posts.filter(p=>p.post_type==='attachment').map(p=>p.ID));
+check('all featuredImageId resolve to attachments', pub.every(p=>p.featuredImageId==null || attIds.has(p.featuredImageId)));
+console.log(`\nRESULT: ${failures===0?'ALL VALIDATIONS PASS':failures+' FAILED'}`);
+process.exit(failures===0?0:1);
