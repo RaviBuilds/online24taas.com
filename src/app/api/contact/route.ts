@@ -1,40 +1,59 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { LIMITS, RateLimiter, getContactConfig, sendContact, validateContact } from '@/lib/contact';
 
-// Replacement for Contact Form 7 (form 7). Delivery needs SMTP settings in the environment:
-//   SMTP_URL (e.g. smtps://user:pass@smtp.example.com:465), CONTACT_TO, CONTACT_FROM
-// Without them the endpoint answers 503 instead of pretending to send.
+// Contact Form 7 replacement. Environment (server only):
+//   SMTP_URL      e.g. smtps://user:pass@smtp.example.com:465
+//   CONTACT_TO    mailbox that receives messages
+//   CONTACT_FROM  sender address the SMTP account is allowed to use (defaults to CONTACT_TO)
+// Without SMTP_URL and CONTACT_TO the endpoint answers 503 rather than pretending to send.
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const clean = (v: unknown, max: number) => String(v ?? '').replace(/[\r\n]+/g, ' ').trim().slice(0, max);
+// Per server instance (see RateLimiter). Add a Vercel Firewall rate-limit rule for /api/contact for a hard limit.
+const perIp = new RateLimiter(5, 10 * 60_000);
+const global = new RateLimiter(100, 60 * 60_000);
+
+const json = (body: Record<string, unknown>, status: number, headers?: Record<string, string>) =>
+  NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store', ...headers } });
 
 export async function POST(req: Request) {
-  let body: Record<string, unknown>;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'अवैध विनंती.' }, { status: 400 });
+  // Browsers always send Origin on cross-site POSTs: reject anything not coming from this site.
+  const origin = req.headers.get('origin');
+  if (origin) {
+    let ok = false;
+    try {
+      ok = new URL(origin).host === (req.headers.get('x-forwarded-host') ?? req.headers.get('host'));
+    } catch {}
+    if (!ok) return json({ error: 'अवैध विनंती.' }, 403);
   }
-  if (clean(body.website, 50)) return NextResponse.json({ ok: true }); // honeypot: pretend success
-  const name = clean(body.name, 100);
-  const email = clean(body.email, 200);
-  const subject = clean(body.subject, 150);
-  const message = String(body.message ?? '').trim().slice(0, 4000);
-  if (!name || !subject || !EMAIL.test(email)) return NextResponse.json({ error: 'कृपया सर्व आवश्यक माहिती योग्य भरा.' }, { status: 422 });
+  if (!(req.headers.get('content-type') ?? '').toLowerCase().startsWith('application/json')) return json({ error: 'अवैध विनंती.' }, 415);
 
-  const { SMTP_URL, CONTACT_TO, CONTACT_FROM } = process.env;
-  if (!SMTP_URL || !CONTACT_TO) return NextResponse.json({ error: 'संदेश सेवा सध्या उपलब्ध नाही.' }, { status: 503 });
+  const raw = await req.text();
+  if (raw.length > LIMITS.maxBodyBytes) return json({ error: 'संदेश खूप मोठा आहे.' }, 413);
+  let body: unknown;
   try {
-    await nodemailer.createTransport(SMTP_URL).sendMail({
-      to: CONTACT_TO,
-      from: CONTACT_FROM || CONTACT_TO,
-      replyTo: `${name.replace(/[<>"]/g, '')} <${email}>`,
-      subject: `[Online24Taas] ${subject}`,
-      text: `From: ${name} <${email}>\nSubject: ${subject}\n\nMessage Body:\n${message}\n\n-- \nThis e-mail was sent from the contact form on Online24Taas`,
-    });
-    return NextResponse.json({ ok: true });
+    body = JSON.parse(raw);
   } catch {
-    return NextResponse.json({ error: 'संदेश पाठवता आला नाही.' }, { status: 502 });
+    return json({ error: 'अवैध विनंती.' }, 400);
+  }
+
+  const ip = req.headers.get('x-real-ip') ?? req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+  const lim = perIp.check(ip);
+  if (!lim.allowed || !global.check('all').allowed) {
+    return json({ error: 'खूप जास्त प्रयत्न झाले आहेत. कृपया थोड्या वेळाने पुन्हा प्रयत्न करा.' }, 429, { 'Retry-After': String(lim.retryAfterSec || 600) });
+  }
+
+  const v = validateContact(body);
+  if (!v.ok && v.reason === 'spam') return json({ ok: true }, 200); // bots get no signal
+  if (!v.ok) return json({ error: 'कृपया चिन्हांकित माहिती तपासा.', fields: v.fields }, 422);
+
+  const cfg = getContactConfig(process.env);
+  if (!cfg) return json({ error: 'संदेश सेवा सध्या उपलब्ध नाही. कृपया ईमेलने संपर्क साधा.' }, 503);
+  try {
+    await sendContact(v.data, cfg, { ip });
+    return json({ ok: true }, 200);
+  } catch (e) {
+    console.error('contact: send failed', e instanceof Error ? e.message : 'unknown error'); // never log the message body / credentials
+    return json({ error: 'संदेश पाठवता आला नाही. कृपया नंतर पुन्हा प्रयत्न करा.' }, 502);
   }
 }

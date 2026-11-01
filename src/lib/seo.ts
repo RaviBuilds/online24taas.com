@@ -3,6 +3,9 @@ import { SITE_NAME, absoluteUrl } from './site';
 import { parseImageRef } from '@/sanity/lib/image';
 import { sanityLoader } from '@/sanity/lib/image';
 
+/** Default share image (site logo on a 1200x630 card). A static file: a file-based opengraph-image would be dropped by any page that sets its own openGraph. */
+export const DEFAULT_OG_IMAGE = { url: absoluteUrl('/og-default.png'), width: 1200, height: 630 };
+
 export function ogImageUrl(ref?: string | null): string | undefined {
   const parsed = ref ? parseImageRef(ref) : null;
   if (!parsed) return undefined;
@@ -30,21 +33,24 @@ interface Opts {
 
 export function buildMetadata(o: Opts): Metadata {
   const canonical = o.canonicalOverride || absoluteUrl(o.path);
+  // Every indexable page gets a description; archives and pages without editor-written text fall back to the title.
+  const description = o.description || `${o.title} - ${SITE_NAME}`;
   return {
     title: o.title,
-    description: o.description,
+    description,
     alternates: { canonical },
-    robots: o.noIndex ? { index: false, follow: true } : undefined,
+    // Only set when needed: an explicit `robots: undefined` here would also wipe the layout-level noindex of previews.
+    ...(o.noIndex ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       title: o.title,
-      description: o.description,
+      description,
       url: canonical,
       siteName: SITE_NAME,
       locale: 'mr_IN',
       type: o.type ?? 'website',
-      ...(o.image ? { images: [{ url: o.image, width: 1200 }] } : {}),
+      images: [o.image ? { url: o.image, width: 1200 } : DEFAULT_OG_IMAGE],
       ...(o.type === 'article' ? { publishedTime: o.publishedTime, modifiedTime: o.modifiedTime } : {}),
     },
-    twitter: { card: 'summary_large_image', title: o.title, description: o.description, ...(o.image ? { images: [o.image] } : {}) },
+    twitter: { card: 'summary_large_image', title: o.title, description, images: [o.image ?? DEFAULT_OG_IMAGE.url] },
   };
 }

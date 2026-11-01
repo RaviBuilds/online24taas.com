@@ -1,12 +1,12 @@
-import Link from 'next/link';
+import Link from './AppLink';
 import { SITE_NAME } from '@/lib/site';
 import { formatLongDate } from '@/lib/format';
 import { categoryPath, pagePath } from '@/lib/urls';
 import type { SiteData } from '@/lib/data';
-import { MobileNav } from './MobileNav';
+import { MainNav, type NavItem } from './MainNav';
 import { SanityImage } from './SanityImage';
 
-export interface NavLink { label: string; href: string }
+export type NavLink = NavItem;
 
 export function navLinks(site: SiteData): NavLink[] {
   const items = site.menu?.items ?? [];
@@ -22,49 +22,36 @@ export function navLinks(site: SiteData): NavLink[] {
   return links.length ? links : site.categories.map((c) => ({ label: c.title, href: categoryPath(c.slug) }));
 }
 
+/** Adore News header: dark top bar (date + social), patterned brand band, then the navigation bar. */
 export function Header({ site }: { site: SiteData }) {
   const links = navLinks(site);
   const social = site.settings?.socialLinks ?? [];
+  const name = site.settings?.title || SITE_NAME;
   return (
-    <header className="border-b border-neutral-200">
-      <div className="bg-topbar text-white">
-        <div className="theme-wrapper flex items-center justify-between text-sm">
-          <span className="bg-primary px-4 py-1.5 font-medium" suppressHydrationWarning>{formatLongDate()}</span>
-          <ul className="flex items-center gap-3">
+    <header className="site-header">
+      <div className="bg-topbar py-2.5 text-white">
+        <div className="theme-wrapper flex items-center justify-between gap-3">
+          <p className="-my-2.5 bg-primary px-3 py-2.5 text-[0.75rem] leading-snug font-bold tracking-[0.5px] sm:px-5 sm:text-[0.85rem]" suppressHydrationWarning>{formatLongDate()}</p>
+          <ul className="flex flex-wrap items-center justify-end gap-x-3 text-[0.75rem] sm:text-[0.8rem]" aria-label="सोशल लिंक">
             {social.map((s) => (
-              <li key={s.url}>
-                <a href={s.url} target="_blank" rel="noopener noreferrer" className="px-1 text-xs hover:text-neutral-300">{s.label}</a>
+              <li key={s.url + s.label}>
+                <a href={s.url} target="_blank" rel="noopener noreferrer" className="block py-1 hover:text-primary">{s.label}</a>
               </li>
             ))}
           </ul>
         </div>
       </div>
-      <div className="theme-wrapper flex items-center gap-4 py-4">
-        <Link href="/" className="flex items-center gap-3" aria-label={SITE_NAME}>
-          {site.settings?.logoRef && <SanityImage imageRef={site.settings.logoRef} alt="" sizes="64px" className="h-14 w-auto" priority />}
-          <span className="block">
-            <span className="block text-2xl font-bold leading-tight">{site.settings?.title || SITE_NAME}</span>
-            {site.settings?.tagline && <span className="block text-sm text-neutral-600">{site.settings.tagline}</span>}
-          </span>
-        </Link>
-      </div>
-      <nav aria-label="मुख्य मेनू" className="relative border-t border-neutral-200">
-        <div className="theme-wrapper flex items-center justify-between">
-          <ul className="hidden flex-wrap md:flex">
-            <li><Link href="/" className="block px-4 py-3 text-sm font-medium hover:text-primary">मुख्यपृष्ठ</Link></li>
-            {links.map((l) => (
-              <li key={l.href + l.label}><Link href={l.href} className="block px-4 py-3 text-sm font-medium hover:text-primary">{l.label}</Link></li>
-            ))}
-          </ul>
-          <MobileNav links={[{ label: 'मुख्यपृष्ठ', href: '/' }, ...links]} />
-          <form action="/search" role="search" className="ml-auto flex items-center py-2">
-            <label htmlFor="site-search" className="sr-only">शोधा</label>
-            <input id="site-search" name="q" type="search" placeholder="शोधा…" className="w-32 border border-neutral-300 px-3 py-1.5 text-sm sm:w-48" />
-            <button type="submit" className="bg-primary px-3 py-1.5 text-sm text-white hover:bg-primary-dark" aria-label="शोधा">🔍</button>
-          </form>
+      <div className="header-band">
+        <div className="theme-wrapper flex justify-center py-1">
+          <Link href="/" className="flex items-center gap-3" aria-label={`${name} - मुख्यपृष्ठ`}>
+            {site.settings?.logoRef ? (
+              <SanityImage imageRef={site.settings.logoRef} alt="" sizes="144px" className="size-24 object-contain sm:size-36" priority />
+            ) : null}
+            <span className="sr-only">{name}</span>
+          </Link>
         </div>
-      </nav>
+      </div>
+      <MainNav links={links} />
     </header>
   );
 }
-

@@ -1,0 +1,36 @@
+{
+  "project": "mkiaioc7",
+  "dataset": "production",
+  "generatedAt": "2026-10-31T17:41:24.117Z",
+  "totalDocuments": 2302,
+  "applicationDocuments": 1590,
+  "applicationByType": {
+    "author": 1,
+    "category": 14,
+    "post": 679,
+    "mediaAsset": 799,
+    "menu": 2,
+    "page": 5,
+    "siteSettings": 1,
+    "tag": 89
+  },
+  "applicationDraftsByType": {
+    "post": 19
+  },
+  "applicationPublishedByType": {
+    "author": 1,
+    "category": 14,
+    "mediaAsset": 799,
+    "menu": 2,
+    "page": 5,
+    "post": 660,
+    "siteSettings": 1,
+    "tag": 89
+  },
+  "sanityManagedByType": {
+    "system.group": 11,
+    "system.retention": 1,
+    "sanity.fileAsset": 5,
+    "sanity.imageAsset": 695
+  }
+}

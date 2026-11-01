@@ -12,10 +12,19 @@ export default defineConfig({
   fullyParallel: true,
   workers: process.env.CI ? 2 : 3,
   reporter: [['list'], ['html', { open: 'never' }]],
-  use: { baseURL, trace: 'retain-on-failure', screenshot: 'only-on-failure', locale: 'mr-IN' },
+  use: {
+    baseURL,
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    locale: 'mr-IN',
+    // Deployment Protection bypass for a protected Vercel preview (never needed for local runs).
+    extraHTTPHeaders: process.env.E2E_BYPASS ? { 'x-vercel-protection-bypass': process.env.E2E_BYPASS } : undefined,
+  },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 1280, height: 900 } }, grepInvert: /@mobile/ },
     { name: 'mobile', use: { ...devices['Pixel 7'], channel: 'chrome' }, grep: /@mobile/ },
+    // Second engine for the layout matrix (WebKit needs system libraries that need root to install).
+    { name: 'firefox', use: { ...devices['Desktop Firefox'], viewport: { width: 1280, height: 900 } }, grep: /@cross/ },
   ],
   webServer: process.env.E2E_BASE_URL
     ? undefined

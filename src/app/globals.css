@@ -1,13 +1,19 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
+@import './header-pattern.css';
 
 @theme {
   --color-primary: #c80815;
   --color-primary-dark: #9e0611;
   --color-ink: #191b1d;
   --color-topbar: #424242;
+  --color-footer: #1c1c1c;
   --font-sans: var(--font-devanagari-latin), var(--font-devanagari), var(--font-roboto), system-ui, 'Segoe UI', sans-serif;
   --breakpoint-xs: 30rem;
+  /* Adore News type scale (--font-size-base / --font-size-md) */
+  --text-card: clamp(1rem, 0.34vw + 0.91rem, 1.19rem);
+  --text-xl: clamp(1.56rem, 1vw + 1.31rem, 2.11rem);
+  --text-lead: clamp(1.25rem, 0.61vw + 1.1rem, 1.58rem);
 }
 
 @layer base {
@@ -18,6 +24,7 @@
   body {
     @apply bg-white font-sans text-ink antialiased;
     /* Devanagari has tall matras; the extra leading prevents clipped/colliding lines */
+    font-size: clamp(1rem, 0.34vw + 0.91rem, 1.19rem);
     line-height: 1.75;
     font-feature-settings: 'kern', 'liga';
   }
@@ -30,7 +37,8 @@
 }
 
 .theme-wrapper {
-  @apply mx-auto w-full max-w-[1200px] px-4;
+  /* Adore News: max-width 1300px, 15px side padding */
+  @apply mx-auto w-full max-w-[1300px] px-[15px];
 }
 
 /* Article body: Portable Text output */
@@ -57,13 +65,32 @@
 .entry-content iframe { @apply max-w-full; }
 
 .section-title {
-  @apply mb-4 flex items-center gap-3 text-lg font-bold;
-}
-.section-title::after {
-  content: '';
-  @apply h-px flex-1 bg-neutral-300;
+  /* Adore News widget title ("section-header-2"): text, red dot, double rule */
+  @apply mb-4 flex items-center gap-2.5 text-[1em] leading-[1.45] font-bold;
 }
 .section-title::before {
   content: '';
-  @apply order-2 size-2 rounded-full bg-primary;
+  @apply order-2 size-2.5 shrink-0 rounded-full bg-primary;
 }
+.section-title::after {
+  content: '';
+  @apply order-3 h-1.5 flex-1 border-y border-black/15;
+}
+.site-footer .section-title { @apply text-white; }
+.site-footer .section-title::after { @apply border-white/15; }
+
+/* Post card thumbnails zoom on hover/focus like the original (disabled for reduced motion). */
+.post-item-image img { transition: transform 0.5s ease-in-out; }
+@media (prefers-reduced-motion: no-preference) {
+  .post-item:hover .post-item-image img, .post-item:focus-within .post-item-image img { transform: scale(1.12); }
+}
+
+/* Headline link underline sweep, as in the theme */
+.entry-title-link {
+  background-image: linear-gradient(transparent calc(99% - 1px), currentColor 1px);
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  transition: background-size 0.5s, color 0.3s;
+}
+.post-item:hover .entry-title-link, .post-item:focus-within .entry-title-link, .entry-title-link:hover { background-size: 100% 100%; }
+.entry-title-link:hover, .entry-title-link:focus-visible { @apply text-primary; }

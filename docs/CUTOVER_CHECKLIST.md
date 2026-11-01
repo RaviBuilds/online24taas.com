@@ -1,33 +1,43 @@
-# Production cut-over checklist (migration done; nothing below section B has been executed)
+# Production cut-over checklist
 
-DNS, the public domain and the old WordPress hosting are **untouched**. Every step below needs an explicit go-ahead.
+State after Phase 4 (2026-11-01). DNS, the public domain and the old WordPress hosting are **untouched**.
+Every step in section C needs an explicit go-ahead.
 
-## A. Sanity access (resolved 2026-10-31)
-`write2ravi14@gmail.com` is administrator of `mkiaioc7`; the production migration is done and verified (see `MIGRATION_ACCEPTANCE_REPORT.md`).
-Do not use the old `blogspageagency@gmail.com` login for this project.
+## A. Done and verified
 
-## B. Before go-live
-- [x] Production migration run; `VERIFY OK` + `RECONCILIATION OK` + integration tests green against `mkiaioc7` (2026-10-31).
-- [ ] Vercel project created from this repo; env vars from `.env.example` (`NEXT_PUBLIC_SANITY_*`, `NEXT_PUBLIC_SITE_URL=https://www.online24taas.com`, `SANITY_REVALIDATE_SECRET`, `SMTP_URL`, `CONTACT_TO`, `CONTACT_FROM`; `SANITY_API_READ_TOKEN` only if the dataset is private).
-- [ ] Sanity → API → CORS origins: add the Vercel preview URL(s) and the production domain **with credentials** (Studio login).
-- [ ] Sanity webhook → `https://<domain>/api/revalidate`, secret = `SANITY_REVALIDATE_SECRET`, projection `{_type, "slug": slug.current}`, trigger create/update/delete.
-- [ ] Deploy a **preview**; run `E2E_BASE_URL=https://<preview> npx playwright test`; check Studio login, create/publish a test post, delete it.
-- [ ] Preview robots: non-production deployments return `Disallow: /` automatically (verify).
-- [ ] Spot-check 20 random `?p=ID` URLs from `migration/reports/*/legacy-redirect-map.csv` on the preview.
+- [x] Sanity access: `write2ravi14@gmail.com` is administrator of `mkiaioc7`. Do not use the old `blogspageagency@gmail.com` login for this project.
+- [x] Production migration run and re-verified against the live dataset (`VERIFY OK`, `RECONCILIATION OK`, integration tests); frozen snapshot with SHA-256 in `sanity-backups/` (`docs/BACKUPS_AND_RECOVERY.md`).
+- [x] Vercel project `online24taas-web` (team `write2ravi14gmailcoms-projects`, Hobby) created from this repo; CLI login done by the owner.
+- [x] Vercel env vars: `NEXT_PUBLIC_SANITY_PROJECT_ID/DATASET/API_VERSION` (Production + Preview), `NEXT_PUBLIC_SITE_URL=https://www.online24taas.com` (Production only; Preview derives its own URL), `SANITY_REVALIDATE_SECRET` (Production and Preview, different values, *sensitive*).
+- [x] Preview deployed: `https://online24taas-preview.vercel.app` (protected by Vercel Authentication; `noindex`, `Disallow: /`).
+- [x] Sanity CORS: `https://online24taas-preview.vercel.app` (with credentials, for the embedded Studio login). Only that origin was added.
+- [x] Sanity webhook `online24taas-preview-revalidate` → preview `/api/revalidate` (HMAC secret; published content only); create/edit/delete verified end to end in 1–4 s.
+- [x] Preview robots: non-production deployments answer `Disallow: /`, `X-Robots-Tag: noindex, nofollow` and a robots meta tag.
+- [x] 20 legacy `?p=ID`, `?cat=`, `?page_id=`, `?s=`, `/feed`, upload URLs verified on the preview (301 to the new URLs).
+- [x] Studio login with Google, image upload, publish, edit: see `PHASE_4_DEPLOYMENT_READINESS_REPORT.md` for the exact evidence and what still needs the owner's own login.
+
+## B. Owner actions before go-live
+
+- [ ] **Studio login proof**: run `npm run studio:login` once (Google sign-in in a visible browser), then `npm run test:studio` (see README). Until then Google login has not been exercised end to end by an automated run.
+- [ ] **SMTP** for the contact form. In Vercel (Production and Preview) set `SMTP_URL`, `CONTACT_TO`, `CONTACT_FROM` (see `.env.example`), redeploy, send one message and confirm it arrives. The old form's recipient was `ajit@online24taas.com`.
+- [ ] **AdSense**: the publisher ID `ca-pub-5681729675386373` is in Site settings and in the old WordPress header, so the script is wired (production deployments only). In the AdSense console open *Sites → ads.txt*, copy the exact lines, set Vercel `ADS_TXT` (Production), redeploy, and check `https://<domain>/ads.txt`.
+- [ ] **Production domain**: add `www.online24taas.com` (and the apex redirect) in Vercel → Domains. Then:
+  - [ ] Sanity → API → CORS: add `https://www.online24taas.com` with credentials.
+  - [ ] Sanity webhook for production: URL `https://www.online24taas.com/api/revalidate`, type *document*, filter `_type in ["post","page","category","tag","author","menu","siteSettings","mediaAsset","redirect"]`, projection `{_type, "slug": slug.current}`, drafts off, secret = the Production `SANITY_REVALIDATE_SECRET` (Vercel → Settings → Environment Variables; the value is hidden, so generate a new one with `openssl rand -hex 32`, set it in Vercel and in the webhook).
+  - [ ] Remove the preview CORS origin and the preview webhook if the preview is no longer needed.
 - [ ] Editors invited in Sanity (Editor role); show them draft → publish.
-- [ ] `ads.txt`: add the Google AdSense line (`google.com, pub-5681729675386373, DIRECT, f08c47fec0942fa0`, confirm in the AdSense console) as a route or `public/ads.txt`; none exists in the old backup.
-- [ ] SMTP configured and one contact-form message received.
-- [ ] Google Search Console: add new property/sitemap `https://www.online24taas.com/sitemap.xml` after cut-over.
+- [ ] **Credential rotation** (WordPress DB, salts, FTP/hosting, admin): `docs/CREDENTIAL_ROTATION.md`.
+- [ ] Revoke the Viewer token `online24taas-migration-test-read` in the old project `qvtcbb1j` and delete the unused dataset `migration-test` there.
+- [ ] Google Search Console: add the property and submit `https://www.online24taas.com/sitemap.xml` after cut-over.
 
 ## C. Cut-over (needs approval)
-1. Lower DNS TTL (24 h ahead). 2. Add the domain in Vercel. 3. Point DNS (A/CNAME) to Vercel. 4. Confirm HTTPS, `/?p=273` → 301, `/sitemap.xml`, `/feed.xml`.
+
+1. Lower the DNS TTL 24 h ahead.
+2. `vercel deploy --prod` (or promote a verified preview), then add the domain in Vercel.
+3. Point DNS (A/CNAME) to Vercel.
+4. Confirm HTTPS, `/?p=273` → 301, `/sitemap.xml`, `/feed.xml`, `/ads.txt`, `/robots.txt` (must allow crawling in production), Studio at `/studio`.
 5. Keep the WordPress host running (read-only) for ≥ 30 days; keep the backup archive.
 
 ## D. Rollback
-Re-point DNS to the old host (WordPress untouched). Sanity data is additive and can stay.
 
-## E. Security follow-ups (not done automatically)
-- WordPress secrets were exposed in `wp-config.php`, `APP-META.INI`, `online24taas.txt`, `online24taas.com credentials.jpg`. **Not rotated** (would interrupt the live site). Rotate DB password, salts, hosting/FTP/cPanel logins after cut-over.
-- Delete the stray 450 MB `Unconfirmed 633112.crdownload` and keep the credential files out of any cloud sync.
-- Sanity project `mkiaioc7` has two robot tokens from an earlier setup (`MCP agent read/write` = editor, `MCP agent readonly`); revoke the read/write one if no longer needed.
-- Sanity: a Viewer token `online24taas-migration-test-read` was created in `qvtcbb1j` for local testing and CORS origin `http://localhost:3100` was added; revoke when no longer needed.
+Re-point DNS to the old host (WordPress untouched). Sanity data is additive and can stay.

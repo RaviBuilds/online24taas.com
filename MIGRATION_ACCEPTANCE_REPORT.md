@@ -1,8 +1,7 @@
 # Acceptance report — against the "Definition of done"
 
 Overall: **the migration into the intended production project `mkiaioc7` / `production` is done and verified against the live
-dataset (2026-10-31).** The Vercel preview, SMTP, CORS/webhook for the deployed origin and the public DNS cut-over are
-NOT done; see "Open items".
+dataset (2026-10-31), and re-verified in Phase 4 (2026-11-01).** A protected Vercel preview with CORS and a working revalidation webhook exists. SMTP, the production domain webhook/CORS and the public DNS cut-over are NOT done; see "Open items" and `PHASE_4_DEPLOYMENT_READINESS_REPORT.md` (status: CONDITIONALLY READY).
 
 ## Content
 | Criterion | Result |
@@ -23,14 +22,14 @@ Known formatting losses (documented, content kept): inline colour/format marks i
 |---|---|
 | Studio loads and works | ✅ HTTP 200, authenticated session, `schema validate` clean |
 | Editor creates / publishes / edits Marathi content | ✅ automated UI test (draft private → publish → edit makes draft) |
-| Taxonomy, image upload, SEO fields | ✅ taxonomy relationships verified; SEO object present. Image *upload via Studio UI* was not exercised (assets were uploaded via API) |
+| Taxonomy, image upload, SEO fields | ✅ taxonomy relationships verified; SEO object present. Phase 4: image upload through the Studio UI (featured image and inline image, with alt text and caption) passed on the deployed preview |
 | Production dataset matches manifest | ✅ `verify`: 1,590/1,590 manifest entries present, 697/697 assets resolve, 0 dangling refs, 684/684 body texts equal source, 0 duplicates, 0 Unicode issues. `reconcile-live`: 0 mismatches. Integration tests 10/10 |
 
 ## Website
 Homepage, article, pages, categories, tags, search (Marathi), pagination, images, Marathi typography
 (Noto Sans Devanagari, line-height ≥ 1.3 asserted), historical redirects, metadata/canonical/OG/JSON-LD, mobile and
 desktop layouts, no console errors: ✅ 28 Playwright tests (1 opt-in Studio test skipped), run against a production build reading `mkiaioc7/production`. Fixed during this run: pagination links are no longer prefetched, because a click made while the same URL's prefetch was in flight could be dropped; fonts are self-hosted.
-Not covered: visual regression vs. the old site (design follows the Adore News structure and `#c80815` brand colour but is not pixel-matched); real-device testing; Lighthouse.
+Phase 4 rebuilt the templates from the Adore News theme source (header, banner, 3-column grid, sidebar, footer); there is no pixel comparison because the old site is unreachable. Not covered: real-device testing (WebKit/Safari cannot run on this machine). Lighthouse numbers are in the Phase 4 report.
 
 ## Engineering
 Reconciliation, import repeatability/resumability, transform tests, TypeScript, build, browser tests: ✅.
@@ -38,7 +37,7 @@ No credentials in git (scan done) or in the client bundle (read token searched f
 ESLint: 0 errors (warnings in migration scripts only).
 
 ## Deployment
-`vercel.json`, `.env.example`, cut-over + rollback checklist: ✅. Preview deployment: ❌ blocked (no Vercel CLI/login here).
+`vercel.json`, `.env.example`, cut-over + rollback checklist: ✅. Preview deployment: ✅ `https://online24taas-preview.vercel.app`.
 Original WordPress backup: untouched (SQL hash recorded in the master plan).
 
 ## Production dataset: what was and was not written
@@ -49,8 +48,4 @@ Original WordPress backup: untouched (SQL hash recorded in the master plan).
 - Failed / unresolved source records: none. Excluded by policy: 806 revisions, 1,082 unapproved comments (archived), auto-draft 2723; listed in `migration/reports/mkiaioc7.production/`.
 
 ## Open items for the owner
-1. Vercel project + env vars (`docs/CUTOVER_CHECKLIST.md` §B), then add the Vercel URL to Sanity CORS (with credentials) and create the revalidate webhook.
-2. SMTP settings for the contact form; `ads.txt` from the AdSense console.
-3. Approve DNS cut-over; rotate exposed WordPress credentials afterwards.
-4. Try an image upload in the deployed Studio with your login (not automatable here).
-5. Side effects in `qvtcbb1j`: dataset `migration-test`, a Viewer token, a localhost CORS origin. Remove if unwanted. Not used by the site any more (`.env.local` points to `mkiaioc7`).
+See `docs/CUTOVER_CHECKLIST.md` §B for the exact steps. In short: Google-login proof run (`npm run studio:login`), SMTP variables, AdSense `ads.txt`, production domain + its CORS origin + webhook, WordPress credential rotation (`docs/CREDENTIAL_ROTATION.md`), revoke the old test token in project `qvtcbb1j`, approve DNS cut-over.

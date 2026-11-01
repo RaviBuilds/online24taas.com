@@ -12,7 +12,9 @@ export const publishedClient = createClient({
   dataset,
   apiVersion,
   token,
-  useCdn: !token && process.env.NODE_ENV === 'production',
+  // Direct API, not the CDN: Next's data cache already absorbs the traffic, and with webhook revalidation the CDN could
+  // still serve the previous version for a moment after the webhook fires.
+  useCdn: false,
   perspective: 'published',
 });
 

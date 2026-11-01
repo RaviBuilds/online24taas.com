@@ -54,5 +54,16 @@ the backup folder and `migration/reports/mkiaioc7.production/`. Re-verified agai
   - E2E "category archive paginates" failed under 3 parallel workers (reproduced 3 times; passes alone). Cause: a click on a page link while Next's prefetch of the same URL was in flight was dropped (confirmed: blocking prefetch requests made the click work first time). Fix: `prefetch={false}` on pagination links. Full suite then passed.
 - **Not possible here**: Vercel (no CLI/login), SMTP (no credentials), Studio image upload through the UI.
 
-## Not done
-Vercel preview deployment, deployed-origin CORS/webhook, SMTP, `ads.txt`, DNS, credential rotation. See `MIGRATION_STATUS.md`.
+## Phase 4 (2026-10-31 / 2026-11-01): production readiness, Vercel preview
+Details and evidence: `PHASE_4_DEPLOYMENT_READINESS_REPORT.md`. Chronological summary:
+- **Dataset frozen and reconciled**: live `mkiaioc7/production` = 2,302 documents = 1,590 application + 712 Sanity-managed. The "missing" 3 of 1,590 are 2 `menu` + 1 `siteSettings`. Backup analysis (106 vs 132) and a scratch-dataset restore test (120/120 identical) in `docs/BACKUPS_AND_RECOVERY.md`. Full post-migration export (218 MB, SHA-256 recorded) taken before any editorial test.
+- **Design**: components rebuilt from the Adore News templates/CSS and the WordPress options (banner = posts 89/105/178, latest-posts blog index with right sidebar, four-column footer).
+- **Contact form**: validation, honeypot, render-time trap, origin check, rate limit, size limits, 503 when SMTP is not configured; 10 new unit tests + real-socket SMTP sink tests. **No real email was sent or tested** (SMTP setup deferred to the owner).
+- **Vercel**: CLI via `npx vercel@latest`; owner approved the device login. No existing project, so `online24taas-web` was created. The first deployment landed in the production environment by default; it was removed and replaced by a preview. Preview `https://online24taas-preview.vercel.app`, Deployment Protection kept on, automation bypass used only by tests and the webhook.
+- **Sanity**: CORS origin for the preview (credentials), document webhook `online24taas-preview-revalidate`; create/edit/delete of a temporary post revalidated the preview in 1–4 s (3 deliveries, all HTTP 200); the temporary post was deleted.
+- **Defect found by testing the real deployment**: every Marathi article returned HTTP 500 on Vercel because per-article cache tags (`post:<Marathi slug>`) travel in the ASCII-only `x-next-cache-tags` header. Local `next start` does not send that header, so earlier local runs could not see it. Fixed with hashed ASCII tags (`src/lib/cache-tags.ts`, used by pages and webhook).
+- **Defects found by the new test matrix**: widget headings had line-height 1.25 (below the 1.3 minimum used for Devanagari); Firefox performed full-page reloads because aborted viewport prefetches made the router fall back to browser navigation (prefetch is now off site-wide via `AppLink`).
+- **Security**: secret scan of all commits and of the client bundle (local and deployed) found nothing; MCP robot token "MCP agent read/write" revoked after checking it was unused; WordPress credential rotation prepared (`docs/CREDENTIAL_ROTATION.md`) but not executed (needs hosting access).
+- **Studio**: UI workflow spec `e2e/studio-ui.spec.ts` and `npm run studio:login` helper; see the report for what was and was not proven.
+- **Test hygiene**: a test run killed mid-way once left a draft/test documents in production; they were identified by title and the absence of WordPress IDs, deleted, and the dataset re-verified at 679 posts / 14 categories / 89 tags / 695 image assets. `tools/cleanup-studio-test.mjs` was added for such cases.
+

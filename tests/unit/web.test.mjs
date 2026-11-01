@@ -50,3 +50,15 @@ test('Studio slugify keeps Devanagari (default Sanity slugify would erase it)', 
   assert.equal(slugify('Hello, World 2024'), 'hello-world-2024');
   assert.ok(slugify('अ '.repeat(100), 20).length <= 20);
 });
+
+import { slugTag } from '../../src/lib/cache-tags.ts';
+test('cache tags are ASCII-only (they travel in the x-next-cache-tags HTTP header) and stable', () => {
+  for (const slug of ['श्री-गणेश-आरती-संग्रह', 'plain-ascii', 'सातबारा-पहा-आपल्या-मोबाईल-वर']) {
+    const tag = slugTag('post', slug);
+    assert.match(tag, /^post:[0-9a-f]{24}$/);
+    assert.equal(tag, slugTag('post', slug));
+  }
+  assert.notEqual(slugTag('post', 'a'), slugTag('page', 'a'));
+  // NFC and NFD forms of the same Devanagari text must map to one tag
+  assert.equal(slugTag('post', 'क्षि'.normalize('NFC')), slugTag('post', 'क्षि'.normalize('NFD')));
+});

@@ -36,3 +36,8 @@ coverage/
 .DS_Store
 
 .next-*/
+.vercel
+.env*
+
+# Saved browser sessions (contain login cookies)
+.auth/

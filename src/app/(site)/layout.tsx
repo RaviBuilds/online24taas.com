@@ -8,6 +8,7 @@ import { Footer } from '@/components/Footer';
 import { getSite } from '@/lib/data';
 import { parseImageRef, sanityLoader } from '@/sanity/lib/image';
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from '@/lib/site';
+import { DEFAULT_OG_IMAGE } from '@/lib/seo';
 
 // Marathi-first typography: Noto Sans Devanagari covers matras/conjuncts with correct metrics;
 // Roboto is only used for Latin text and digits that fall outside the Devanagari subset.
@@ -40,18 +41,21 @@ const baseMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: `${SITE_NAME} - ${SITE_TAGLINE}`, template: `%s | ${SITE_NAME}` },
   description: SITE_TAGLINE,
-  openGraph: { siteName: SITE_NAME, locale: 'mr_IN', type: 'website' },
-  twitter: { card: 'summary_large_image' },
+  openGraph: { siteName: SITE_NAME, locale: 'mr_IN', type: 'website', images: [DEFAULT_OG_IMAGE] },
+  twitter: { card: 'summary_large_image', images: [DEFAULT_OG_IMAGE.url] },
   alternates: { types: { 'application/rss+xml': `${SITE_URL}/feed.xml` } },
 };
 
+const isNonProduction = !!process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production';
+
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSite();
+  const base: Metadata = isNonProduction ? { ...baseMetadata, robots: { index: false, follow: false } } : baseMetadata;
   const ref = site.settings?.faviconRef;
   const parsed = ref ? parseImageRef(ref) : null;
-  if (!parsed) return baseMetadata;
+  if (!parsed) return base;
   const icon = sanityLoader({ src: parsed.url, width: 96 });
-  return { ...baseMetadata, icons: { icon, apple: icon } };
+  return { ...base, icons: { icon, apple: icon } };
 }
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#c80815' };

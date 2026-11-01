@@ -25,6 +25,12 @@ export const SITE_QUERY = /* groq */ `{
   "categories": *[_type == "category" && ${NOT_DRAFT}] | order(title asc){ title, "slug": slug.current, "count": count(*[_type == "post" && ^._id in categories[]._ref && ${NOT_DRAFT}]) }
 }`;
 
+export const FOOTER_QUERY = /* groq */ `{
+  "stories": *[_type == "post" && ${NOT_DRAFT} && defined(slug.current) && wpPostId in $storyIds]{ wpPostId, title, "slug": slug.current },
+  "topics": *[_type == "category" && wpTermId in $topicIds]{ wpTermId, title, "slug": slug.current },
+  "logoRef": *[_type == "mediaAsset" && wpAttachmentId == $logoWpId][0].image.asset._ref
+}`;
+
 export const BANNER_QUERY = /* groq */ `*[_id == "siteSettings"][0].featuredPosts[]->${POST_CARD}`;
 
 export const LATEST_QUERY = /* groq */ `*[_type == "post" && ${NOT_DRAFT} && defined(slug.current)] | order(publishedAt desc) [$from...$to] ${POST_CARD}`;

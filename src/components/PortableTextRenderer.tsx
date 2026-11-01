@@ -1,6 +1,6 @@
 import { PortableText, type PortableTextComponents } from '@portabletext/react';
 import type { PortableTextBlock } from '@portabletext/types';
-import Link from 'next/link';
+import Link from './AppLink';
 import { sanitizeHtml } from '@/lib/sanitizeHtml';
 import { SanityImage } from './SanityImage';
 

@@ -18,7 +18,10 @@ const nextConfig = {
     return [
       { source: '/:path*', headers: securityHeaders },
       // Studio is for editors only: keep it out of search indexes at the HTTP level too.
+      { source: '/studio', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
       { source: '/studio/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
+      // Anything that is not the real production deployment (previews, local) must never be indexed.
+      ...(process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production' ? [{ source: '/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] }] : []),
     ];
   },
 };

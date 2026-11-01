@@ -1,0 +1,20 @@
+# Never upload secrets, raw WordPress data, backups or local build output.
+.env
+.env.*
+!.env.example
+*.sql
+*.SQL
+*.tar.gz
+*.ndjson
+*.crdownload
+migration/work
+migration/backups
+migration/out
+migration/state
+playwright-report
+test-results
+.next
+.next-*
+.sanity
+.vercel
+coverage

@@ -132,7 +132,7 @@ test.describe('taxonomy, pages, search, pagination', () => {
     const c = categories.find((x) => posts.filter((p) => p.categoryIds.includes(x.id)).length > 12)!;
     await page.goto(`/category/${enc(c.slug)}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(c.title);
-    expect(await page.locator('main section[data-listing] > article').count()).toBe(10);
+    expect(await page.locator('main section[data-listing] article').count()).toBe(10);
     await page.getByRole('link', { name: '2', exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/category/${enc(c.slug)}/page/2$`));
     expect(await page.locator('main article').count()).toBeGreaterThan(0);
@@ -167,7 +167,8 @@ test.describe('taxonomy, pages, search, pagination', () => {
 
   test('Marathi search finds articles; empty and no-hit queries behave', async ({ page }) => {
     await page.goto('/');
-    await page.getByLabel('शोधा').first().fill('कबनूर');
+    await page.getByRole('button', { name: 'शोधा', exact: true }).first().click();
+    await page.getByRole('searchbox', { name: 'शोधा' }).fill('कबनूर');
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/\/search\?q=/);
     expect(await page.locator('main article').count()).toBeGreaterThan(0);
@@ -265,9 +266,9 @@ test.describe('layouts', () => {
   test('@mobile menu toggles, article has no horizontal overflow', async ({ page }) => {
     await page.goto('/');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    await page.getByRole('button', { name: /मेनू/ }).click();
-    await expect(page.locator('#mobile-menu')).toBeVisible();
-    await page.locator('#mobile-menu a').nth(1).click();
+    await page.getByRole('button', { name: 'मेनू उघडा' }).click();
+    await expect(page.locator('#primary-menu')).toBeVisible();
+    await page.locator('#primary-menu a').nth(1).click();
     await expect(page).toHaveURL(/\/category\//);
     await page.goto(`/blog/${enc(post(2584).slug)}`);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
