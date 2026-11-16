@@ -5,6 +5,7 @@ import { pageRange, parsePage, type PostCardData } from '@/lib/data';
 import { Listing } from '@/components/Listing';
 import { searchPath } from '@/lib/urls';
 import { toMatchQuery } from '@/lib/search';
+import { SearchForm } from '@/components/SearchForm';
 
 type Props = { searchParams: Promise<{ q?: string; page?: string }> };
 
@@ -23,6 +24,7 @@ export default async function SearchPage({ searchParams }: Props) {
     <Listing
       heading={q ? `शोध: “${q}”` : 'शोध'}
       crumbs={[{ name: 'शोध' }]}
+      top={<SearchForm defaultValue={q} className="mb-6" />}
       posts={data.posts}
       total={data.total}
       page={page}

@@ -7,7 +7,8 @@ import { slugTag } from '@/lib/cache-tags';
 import { buildMetadata, plainDescription } from '@/lib/seo';
 import { PortableTextRenderer } from '@/components/PortableTextRenderer';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { ContentLayout } from '@/components/ContentLayout';
+import { WarliBand } from '@/components/Illustration';
+import { pageLabel } from '@/lib/labels';
 
 export const revalidate = 300;
 // ISR: render on first request, then cache and refresh in the background / on Sanity webhook.
@@ -32,15 +33,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function StaticPage({ params }: Props) {
   const page = await load(decodeParam((await params).slug));
   if (!page) notFound();
+  const title = pageLabel(page.slug, page.title);
   return (
-    <div className="theme-wrapper mt-[30px]">
-      <ContentLayout>
-        <article className="min-w-0">
-          <h1 className="text-[length:var(--text-xl)] leading-[1.4] font-bold [overflow-wrap:anywhere]">{page.title}</h1>
-          <Breadcrumbs items={[{ name: page.title }]} />
+    <div className="theme-wrapper pt-3 sm:pt-6">
+      <article className="mx-auto max-w-[46rem]">
+        <header className="relative overflow-hidden border-b border-line pb-6">
+          <Breadcrumbs items={[{ name: page.title, label: title }]} className="mb-3" />
+          <h1 className="hl text-[1.875rem] sm:text-[2.5rem]">{title}</h1>
+          <WarliBand className="mt-4 h-10 text-saffron-ink/[0.16]" />
+        </header>
+        <div className="mt-6">
           <PortableTextRenderer value={page.body} />
-        </article>
-      </ContentLayout>
+        </div>
+      </article>
     </div>
   );
 }
