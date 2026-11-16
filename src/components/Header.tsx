@@ -33,7 +33,7 @@ function Logo({ imageRef, name }: { imageRef?: string; name: string }) {
   return (
     <Link href="/" aria-label={`${name} - मुख्यपृष्ठ`} className="hdr-logo relative block h-12 w-[82px] shrink-0 overflow-hidden xl:h-14 xl:w-[96px]">
       {imageRef ? (
-        <SanityImage imageRef={imageRef} alt="" sizes="120px" priority className="absolute top-[-36%] left-[-8.1%] block h-auto w-[116.3%] max-w-none mix-blend-multiply" />
+        <SanityImage imageRef={imageRef} alt="" sizes="120px" priority className="absolute top-[-33%] left-[-8.1%] block h-auto w-[116.3%] max-w-none mix-blend-multiply" />
       ) : (
         <span className="text-lg font-extrabold">{name}</span>
       )}

@@ -52,10 +52,11 @@ export default async function HomePage() {
     seenTitles.add(title);
     return true;
   };
-  const distinctTitle = (p: PostCardData) => {
-    const title = p.title.trim();
-    if (seenTitles.has(title)) return false;
-    seenTitles.add(title);
+  // Sections: repeated titles are common ("श्री स्वामी समर्थ"), so only the picture has to differ.
+  const distinctImage = (p: PostCardData) => {
+    const img = p.image?.ref;
+    if (img && seenImages.has(img)) return false;
+    if (img) seenImages.add(img);
     return true;
   };
   // Hero: newest posts that have a usable, distinct image (generic repeated graphics are not allowed to fill it).
@@ -70,8 +71,8 @@ export default async function HomePage() {
     .map((c, i) => {
       const data = cats[i];
       if (!data) return null;
-      const featured = take(data.posts, used, 1, distinctVisual);
-      const rest = take(data.posts, used, 4, distinctTitle);
+      const featured = take(data.posts, used, 1, (p) => hasUsableImage(p) && distinctImage(p));
+      const rest = take(data.posts, used, 4, distinctImage);
       if (!featured[0] || rest.length < 3) {
         // Not enough real posts: give them back so another block may use them.
         [...featured, ...rest].forEach((p) => used.delete(p._id));

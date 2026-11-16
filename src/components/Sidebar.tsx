@@ -23,7 +23,7 @@ export async function Sidebar({ posts, title = 'ताज्या बातम�
         </section>
       )}
       {cats.length > 0 && (
-        <section aria-labelledby="sb-cats">
+        <section aria-labelledby="sb-cats" className="max-lg:hidden">
           <SectionHeader id="sb-cats" title="विभाग" tone="saffron" />
           <ul className="divide-y divide-line rounded-[var(--radius-img)] border border-line bg-surface">
             {cats.map((c) => (
