@@ -1,19 +1,26 @@
 import Link from './AppLink';
 import { JsonLd } from './JsonLd';
+import { Icon } from './Icon';
 import { absoluteUrl } from '@/lib/site';
 
-export interface Crumb { name: string; href?: string }
+/** `name` feeds the structured data. `label` (display only) and `hidden` (not shown to readers) are visual overrides. */
+export interface Crumb { name: string; href?: string; label?: string; hidden?: boolean }
 
-export function Breadcrumbs({ items }: { items: Crumb[] }) {
+export function Breadcrumbs({ items, className = '' }: { items: Crumb[]; className?: string }) {
   const all: Crumb[] = [{ name: 'मुख्यपृष्ठ', href: '/' }, ...items];
+  const shown = all.filter((c) => !c.hidden);
   return (
     <>
-      <nav aria-label="Breadcrumb" className="mt-3 mb-1 text-[0.85rem] text-neutral-600">
-        <ol className="flex flex-wrap items-center gap-x-1.5">
-          {all.map((c, i) => (
-            <li key={i} className="flex min-w-0 items-center gap-1.5">
-              {i > 0 && <span aria-hidden>/</span>}
-              {c.href && i < all.length - 1 ? <Link href={c.href} className="hover:text-primary">{c.name}</Link> : <span aria-current={i === all.length - 1 ? 'page' : undefined} className="[overflow-wrap:anywhere]">{c.name}</span>}
+      <nav aria-label="मार्ग" className={`text-[0.8125rem] text-muted ${className}`}>
+        <ol className="flex flex-wrap items-center gap-x-1">
+          {shown.map((c, i) => (
+            <li key={i} className="flex min-w-0 items-center gap-1">
+              {i > 0 && <Icon name="chevronRight" className="size-3.5 shrink-0 opacity-60" />}
+              {c.href && i < shown.length - 1 ? (
+                <Link href={c.href} className="inline-flex min-h-8 items-center hover:text-brand-dark">{c.label ?? c.name}</Link>
+              ) : (
+                <span aria-current={i === shown.length - 1 ? 'page' : undefined} className="line-clamp-1 [overflow-wrap:anywhere]">{c.label ?? c.name}</span>
+              )}
             </li>
           ))}
         </ol>

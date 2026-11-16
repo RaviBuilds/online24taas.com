@@ -1,97 +1,141 @@
 import Link from './AppLink';
 import type { PostCardData } from '@/lib/data';
-import { categoryPath, postPath } from '@/lib/urls';
+import { postPath } from '@/lib/urls';
 import { formatDate } from '@/lib/format';
-import { SanityImage } from './SanityImage';
+import { primaryCategory, toneFor } from '@/lib/present';
+import { CoverImage } from './CoverImage';
 
-function CategoryChips({ post }: { post: PostCardData }) {
-  if (!post.categories?.length) return null;
+/** Small coloured-dot category label. Renders nothing for posts with only the placeholder "All" category. */
+export function CategoryLabel({ post, onImage }: { post: Pick<PostCardData, 'categories'>; onImage?: boolean }) {
+  const c = primaryCategory(post.categories);
+  if (!c) return null;
   return (
-    <ul className="flex flex-wrap gap-[5px]" aria-label="विभाग">
-      {post.categories.map((c) => (
-        <li key={c.slug}>
-          <Link href={categoryPath(c.slug)} className="block rounded-[3px] bg-primary px-[7px] py-[3px] text-[0.75rem] leading-[1.4] text-white hover:opacity-80">{c.title}</Link>
-        </li>
-      ))}
-    </ul>
+    <span data-tone={toneFor(c.slug)} className={`label-dot ${onImage ? 'on-img' : ''}`}>
+      {c.title}
+    </span>
   );
 }
 
-function Meta({ post, light }: { post: PostCardData; light?: boolean }) {
+function When({ post, className = '' }: { post: PostCardData; className?: string }) {
   return (
-    <p className={`flex flex-wrap items-center text-[0.8rem] font-medium ${light ? 'text-white' : ''}`}>
-      {post.authorName && (
-        <>
-          <span>{post.authorName}</span>
-          <span aria-hidden className={`mx-1.5 inline-block size-[3px] ${light ? 'bg-white' : 'bg-ink'}`} />
-        </>
-      )}
-      <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
-    </p>
+    <time dateTime={post.publishedAt} className={`text-[0.8125rem] leading-6 ${className}`}>
+      {formatDate(post.publishedAt)}
+    </time>
   );
 }
 
-/** Grid card (Adore News "post-item post-grid"): thumbnail, category chips, headline, meta, excerpt. */
-export function PostCard({ post, priority }: { post: PostCardData; priority?: boolean }) {
+const stretch = 'after:absolute after:inset-0 after:z-10';
+
+/** LEAD: the one story that matters most. Full-bleed image, gradient scrim, large headline. */
+export function LeadCard({ post, priority, className = '' }: { post: PostCardData; priority?: boolean; className?: string }) {
   return (
-    <article className="post-item min-w-0">
-      <Link href={postPath(post.slug)} className="post-item-image relative block aspect-[10/7] overflow-hidden bg-neutral-100" aria-hidden tabIndex={-1}>
-        {post.image?.ref && <SanityImage fill imageRef={post.image.ref} alt="" sizes="(min-width: 1024px) 300px, (min-width: 600px) 45vw, 100vw" priority={priority} className="object-cover" />}
-      </Link>
-      <div className="pt-[15px]">
-        <CategoryChips post={post} />
-        <h2 className="my-2.5 text-[length:var(--text-card)] leading-[1.45] font-bold [overflow-wrap:anywhere]">
-          <Link href={postPath(post.slug)} className="entry-title-link">{post.title}</Link>
+    <article className={`group relative isolate overflow-hidden rounded-[var(--radius-img)] bg-ink press ${className}`}>
+      <div className="zoom absolute inset-0 -z-10">
+        <CoverImage imageRef={post.image?.ref} ratio={1.4} sizes="(min-width: 1024px) 700px, 100vw" priority={priority} />
+      </div>
+      <div className="scrim absolute inset-0 -z-10" />
+      <div className="flex h-full min-h-[22rem] flex-col justify-end gap-2 p-4 pt-24 text-white sm:p-6 md:min-h-[30rem]">
+        <CategoryLabel post={post} onImage />
+        <h2 className="hl line-clamp-4 text-[1.5rem] sm:text-[1.85rem] lg:text-[2.1rem]">
+          <Link href={postPath(post.slug)} className={`u-link ${stretch}`}>{post.title}</Link>
         </h2>
-        <div className="mb-2.5"><Meta post={post} /></div>
-        {post.excerpt && <p className="line-clamp-3 text-[0.95rem] leading-[1.7] text-neutral-700">{post.excerpt}</p>}
+        <When post={post} className="text-white/80" />
       </div>
     </article>
   );
 }
 
-/** Banner tile (Adore News "overlay-post slider-item"): full-bleed image, gradient, text bottom-left. */
-export function OverlayTile({ post, large, priority, className = '' }: { post: PostCardData; large?: boolean; priority?: boolean; className?: string }) {
+/** SECONDARY: smaller overlay card that sits beside or below the lead. */
+export function SecondaryCard({ post, priority, className = '' }: { post: PostCardData; priority?: boolean; className?: string }) {
   return (
-    <article
-      className={`post-item group relative isolate min-h-[220px] overflow-hidden bg-neutral-800 ${large ? 'min-h-[280px] md:min-h-[360px] lg:min-h-[440px]' : ''} ${className}`}
-    >
-      {post.image?.ref && (
-        <SanityImage
-          fill
-          imageRef={post.image.ref}
-          alt=""
-          sizes={large ? '(min-width: 1024px) 640px, 100vw' : '(min-width: 1024px) 320px, (min-width: 768px) 50vw, 100vw'}
-          priority={priority}
-          fetchPriority={large && priority ? 'high' : undefined}
-          className="-z-10 object-cover transition-transform duration-500 motion-safe:group-hover:scale-105"
-        />
-      )}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-        <CategoryChips post={post} />
-        <h2 className={`my-2 leading-[1.45] font-bold [overflow-wrap:anywhere] ${large ? 'text-[length:var(--text-lead)]' : 'text-[length:var(--text-card)]'}`}>
-          <Link href={postPath(post.slug)} className="after:absolute after:inset-0 after:z-10 hover:underline focus-visible:outline-white">{post.title}</Link>
-        </h2>
-        <Meta post={post} light />
+    <article className={`group relative isolate overflow-hidden rounded-[var(--radius-img)] bg-ink press ${className}`}>
+      <div className="zoom absolute inset-0 -z-10">
+        <CoverImage imageRef={post.image?.ref} ratio={1.5} sizes="(min-width: 1024px) 380px, 80vw" priority={priority} />
+      </div>
+      <div className="scrim absolute inset-0 -z-10" />
+      <div className="flex h-full min-h-[11.5rem] flex-col justify-end gap-1.5 p-3.5 pt-16 text-white">
+        <CategoryLabel post={post} onImage />
+        <h3 className="hl line-clamp-3 text-[1.0625rem] sm:text-[1.125rem]">
+          <Link href={postPath(post.slug)} className={`u-link ${stretch}`}>{post.title}</Link>
+        </h3>
+        <When post={post} className="text-white/75" />
       </div>
     </article>
   );
 }
 
-/** Plain headline row for sidebars ("Latest Post" widget in the original lists titles only). */
-export function MiniCard({ post, thumb }: { post: PostCardData; thumb?: boolean }) {
+/** STANDARD: image on top, then label, headline, date and an optional excerpt. */
+export function StandardCard({ post, priority, excerpt = true, className = '' }: { post: PostCardData; priority?: boolean; excerpt?: boolean; className?: string }) {
   return (
-    <article className="flex gap-3 border-b border-black/10 py-2.5 last:border-0">
+    <article className={`group relative min-w-0 press ${className}`}>
+      <div className="zoom relative aspect-[16/10] overflow-hidden rounded-[var(--radius-img)] bg-ink-2">
+        <CoverImage imageRef={post.image?.ref} ratio={1.6} sizes="(min-width: 1024px) 400px, (min-width: 640px) 45vw, 100vw" priority={priority} />
+      </div>
+      <div className="flex flex-col gap-1 pt-3">
+        <CategoryLabel post={post} />
+        <h3 className="hl line-clamp-3 text-[1.1875rem]">
+          <Link href={postPath(post.slug)} className={`u-link ${stretch}`}>{post.title}</Link>
+        </h3>
+        {excerpt && post.excerpt && <p className="line-clamp-2 text-[0.9375rem] leading-[1.7] text-muted">{post.excerpt}</p>}
+        <When post={post} className="text-muted" />
+      </div>
+    </article>
+  );
+}
+
+/** COMPACT: small thumbnail beside the headline. The dense row for mobile lists and sidebars. */
+export function CompactCard({ post, thumb = true, className = '' }: { post: PostCardData; thumb?: boolean; className?: string }) {
+  return (
+    <article className={`group relative flex min-w-0 gap-3 py-3 press ${className}`}>
       {thumb && (
-        <Link href={postPath(post.slug)} className="relative block size-16 shrink-0 overflow-hidden bg-neutral-100" aria-hidden tabIndex={-1}>
-          {post.image?.ref && <SanityImage fill imageRef={post.image.ref} alt="" sizes="64px" className="object-cover" />}
-        </Link>
+        <div className="zoom relative size-[5.5rem] shrink-0 overflow-hidden rounded-xl bg-ink-2 sm:size-24">
+          <CoverImage imageRef={post.image?.ref} ratio={1} sizes="96px" />
+        </div>
       )}
-      <div className="min-w-0">
-        <h3 className="text-[0.95rem] leading-[1.5] font-semibold [overflow-wrap:anywhere]"><Link href={postPath(post.slug)} className="hover:text-primary">{post.title}</Link></h3>
-        <p className="mt-0.5 text-[0.8rem] text-neutral-600">{formatDate(post.publishedAt)}</p>
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
+        <CategoryLabel post={post} />
+        <h3 className="hl line-clamp-3 text-[1rem] font-bold">
+          <Link href={postPath(post.slug)} className={`u-link ${stretch}`}>{post.title}</Link>
+        </h3>
+        <When post={post} className="text-muted" />
       </div>
     </article>
   );
+}
+
+/** TEXT-ONLY: headline and meta, for long lists and posts without a usable image. */
+export function TextCard({ post, className = '' }: { post: PostCardData; className?: string }) {
+  return (
+    <article className={`group relative flex min-w-0 flex-col gap-0.5 py-3 press ${className}`}>
+      <CategoryLabel post={post} />
+      <h3 className="hl line-clamp-3 text-[1.0625rem] font-bold">
+        <Link href={postPath(post.slug)} className={`u-link ${stretch}`}>{post.title}</Link>
+      </h3>
+      <When post={post} className="text-muted" />
+    </article>
+  );
+}
+
+/** Archive card: compact row on phones (many stories per screen), image-on-top card from 640px up. */
+export function ListCard({ post, priority, className = '' }: { post: PostCardData; priority?: boolean; className?: string }) {
+  return (
+    <article className={`group relative flex min-w-0 gap-3 border-b border-line py-3 press last:border-0 sm:block sm:border-0 sm:py-0 ${className}`}>
+      <div className="zoom relative size-[5.5rem] shrink-0 overflow-hidden rounded-xl bg-ink-2 sm:aspect-[16/10] sm:size-auto sm:rounded-[var(--radius-img)]">
+        <CoverImage imageRef={post.image?.ref} ratio={1.3} sizes="(min-width: 1024px) 400px, (min-width: 640px) 45vw, 96px" priority={priority} />
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 sm:justify-start sm:gap-1 sm:pt-3">
+        <CategoryLabel post={post} />
+        <h3 className="hl line-clamp-3 text-[1rem] sm:text-[1.1875rem]">
+          <Link href={postPath(post.slug)} className={`u-link ${stretch}`}>{post.title}</Link>
+        </h3>
+        {post.excerpt && <p className="line-clamp-2 text-[0.9375rem] leading-[1.7] text-muted max-sm:hidden">{post.excerpt}</p>}
+        <When post={post} className="text-muted" />
+      </div>
+    </article>
+  );
+}
+
+/** Dispatch used by long lists: posts with a real image get a thumbnail row, others fall back to text. */
+export function FeedItem({ post }: { post: PostCardData }) {
+  return post.image?.ref ? <CompactCard post={post} /> : <TextCard post={post} />;
 }

@@ -3,6 +3,7 @@ import type { PortableTextBlock } from '@portabletext/types';
 import Link from './AppLink';
 import { sanitizeHtml } from '@/lib/sanitizeHtml';
 import { SanityImage } from './SanityImage';
+import { parseImageRef } from '@/sanity/lib/image';
 
 // WordPress core palette used by the original colour marks.
 const COLORS: Record<string, string> = {
@@ -47,12 +48,18 @@ const components: PortableTextComponents = {
     number: ({ children }) => <ol>{children}</ol>,
   },
   types: {
-    image: ({ value }) => (
-      <figure>
-        <SanityImage imageRef={value?.ref ?? value?.asset?._ref} alt={value?.alt || value?.caption || ''} sizes="(min-width: 1024px) 760px, 100vw" />
-        {value?.caption ? <figcaption>{value.caption}</figcaption> : null}
-      </figure>
-    ),
+    image: ({ value }) => {
+      const ref: string | undefined = value?.ref ?? value?.asset?._ref;
+      const dims = ref ? parseImageRef(ref) : null;
+      // Small images keep their natural width instead of being stretched (and blurred) to the column.
+      const small = !!dims && dims.width < 520;
+      return (
+        <figure>
+          <SanityImage imageRef={ref} alt={value?.alt || value?.caption || ''} sizes="(min-width: 1024px) 736px, 100vw" className={small ? 'sm:!w-auto sm:max-w-full' : ''} />
+          {value?.caption ? <figcaption>{value.caption}</figcaption> : null}
+        </figure>
+      );
+    },
     // Sanitised on the server; iframes only for allow-listed hosts (see lib/sanitizeHtml).
     rawHtml: ({ value }) => <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(value?.html || '') }} />,
   },

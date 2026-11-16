@@ -1,10 +1,9 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import { Icon } from './Icon';
 
 type Fields = Partial<Record<'name' | 'email' | 'subject' | 'message', string>>;
 type State = { status: 'idle' | 'sending' | 'ok' | 'error'; message?: string; fields?: Fields };
-
-const input = 'mt-1 w-full border border-white/30 bg-neutral-800 px-3 py-2 text-base text-white placeholder:text-neutral-400 aria-[invalid=true]:border-red-400';
 
 // Replaces Contact Form 7 (form id 7): name*, email*, subject*, message (optional). Spam control: hidden honeypot,
 // render-time stamp (bots submit instantly), and server-side validation + rate limiting in /api/contact.
@@ -44,32 +43,38 @@ export function ContactForm() {
 
   const err = (k: keyof Fields) => state.fields?.[k];
   const aria = (k: keyof Fields) => ({ 'aria-invalid': err(k) ? true : undefined, 'aria-describedby': err(k) ? `contact-${k}-error` : undefined });
-  const fieldError = (k: keyof Fields) => err(k) && <span id={`contact-${k}-error`} className="mt-1 block text-sm text-red-300">{err(k)}</span>;
+  const fieldError = (k: keyof Fields) => err(k) && <span id={`contact-${k}-error`} className="mt-1 block text-sm font-medium text-[#ffb4b4]">{err(k)}</span>;
+  const label = 'block text-[0.9375rem] font-semibold text-white/90';
 
   return (
-    <form ref={formRef} onSubmit={onSubmit} className="space-y-3" aria-label="संपर्क फॉर्म">
-      <label className="block text-[0.95rem]">तुमचे नाव *
-        <input name="name" required maxLength={100} autoComplete="name" className={input} {...aria('name')} />
+    <form ref={formRef} onSubmit={onSubmit} className="space-y-4" aria-label="संपर्क फॉर्म" noValidate={false}>
+      <label className={label}>तुमचे नाव <span aria-hidden className="text-saffron">*</span>
+        <input name="name" required maxLength={100} autoComplete="name" className="field" {...aria('name')} />
         {fieldError('name')}
       </label>
-      <label className="block text-[0.95rem]">ईमेल *
-        <input name="email" type="email" required maxLength={200} autoComplete="email" className={input} {...aria('email')} />
+      <label className={label}>ईमेल <span aria-hidden className="text-saffron">*</span>
+        <input name="email" type="email" required maxLength={200} autoComplete="email" inputMode="email" className="field" {...aria('email')} />
         {fieldError('email')}
       </label>
-      <label className="block text-[0.95rem]">विषय *
-        <input name="subject" required maxLength={150} className={input} {...aria('subject')} />
+      <label className={label}>विषय <span aria-hidden className="text-saffron">*</span>
+        <input name="subject" required maxLength={150} className="field" {...aria('subject')} />
         {fieldError('subject')}
       </label>
-      <label className="block text-[0.95rem]">संदेश (ऐच्छिक)
-        <textarea name="message" rows={4} maxLength={4000} className={input} {...aria('message')} />
+      <label className={label}>संदेश <span className="font-normal text-white/60">(ऐच्छिक)</span>
+        <textarea name="message" rows={4} maxLength={4000} className="field resize-y" {...aria('message')} />
         {fieldError('message')}
       </label>
       <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden"><label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label></div>
-      <button type="submit" disabled={state.status === 'sending'} className="bg-primary px-5 py-2.5 text-[0.95rem] font-semibold text-white hover:bg-primary-dark disabled:opacity-60">
-        {state.status === 'sending' ? 'पाठवत आहे…' : 'पाठवा'}
+      <button type="submit" disabled={state.status === 'sending'} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-saffron px-7 font-extrabold text-ink transition-[background-color,scale] duration-150 hover:bg-white active:scale-[0.98] disabled:opacity-60">
+        {state.status === 'sending' ? 'पाठवत आहे…' : <>पाठवा <Icon name="arrowRight" className="size-4" /></>}
       </button>
       {/* Always mounted so screen readers announce the text when it changes */}
-      <p role={state.status === 'error' ? 'alert' : 'status'} aria-live={state.status === 'error' ? 'assertive' : 'polite'} className={`min-h-6 text-[0.95rem] ${state.status === 'ok' ? 'text-green-400' : 'text-red-300'}`}>
+      <p
+        role={state.status === 'error' ? 'alert' : 'status'}
+        aria-live={state.status === 'error' ? 'assertive' : 'polite'}
+        className={`min-h-6 text-[0.9375rem] font-semibold ${state.status === 'ok' ? 'flex items-center gap-2 rounded-xl bg-[#1f6b3a]/40 px-3 py-2 text-[#c9f2d6]' : state.status === 'error' ? 'rounded-xl bg-[#a80f18]/40 px-3 py-2 text-[#ffd3d3]' : ''}`}
+      >
+        {state.status === 'ok' && <Icon name="check" className="size-5 shrink-0" />}
         {state.message}
       </p>
     </form>
