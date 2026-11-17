@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import localFont from 'next/font/local';
 import '../globals.css';
 import Script from 'next/script';
+import { Analytics } from '@vercel/analytics/next';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { getSite } from '@/lib/data';
@@ -63,6 +64,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <main id="content" className="min-h-[60svh]">{children}</main>
         <Footer site={site} />
         {showAds && <Script id="adsense" async crossOrigin="anonymous" strategy="afterInteractive" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsId}`} />}
+        <Analytics />
       </body>
     </html>
   );
