@@ -1,0 +1,76 @@
+<!doctype html>
+<!-- DEV-ONLY Marathi typography comparison. Not part of the Next.js app, not served in production. -->
+<html lang="mr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Marathi typography comparison (dev only)</title>
+<style>
+@font-face { font-family: 'Noto-2006'; src: url(fonts/noto-2.006-devanagari.woff2) format('woff2'); font-weight: 100 900; }
+@font-face { font-family: 'Noto-2007'; src: url(fonts/noto-2.007-devanagari.woff2) format('woff2'); font-weight: 100 900; }
+@font-face { font-family: 'Tiro'; src: url(fonts/TiroDevanagariMarathi-Regular.ttf); font-weight: 400; }
+@font-face { font-family: 'Mukta'; src: url(fonts/Mukta-Regular.ttf); font-weight: 400; }
+@font-face { font-family: 'Mukta'; src: url(fonts/Mukta-Medium.ttf); font-weight: 500; }
+@font-face { font-family: 'Mukta'; src: url(fonts/Mukta-SemiBold.ttf); font-weight: 600; }
+@font-face { font-family: 'Mukta'; src: url(fonts/Mukta-Bold.ttf); font-weight: 700; }
+:root { --ink:#14110f; --line:#e8e1d9; --paper:#fbf8f4; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: var(--paper); color: var(--ink); font: 14px/1.4 system-ui, sans-serif; }
+h1 { font-size: 18px; margin: 0 0 4px; }
+p.note { margin: 0 0 16px; color: #6b625b; max-width: 90ch; }
+.controls { position: sticky; top: 0; background: var(--paper); padding: 8px 0; z-index: 2; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--line); }
+section { margin: 28px 0; }
+section > h2 { font-size: 15px; margin: 0 0 8px; border-bottom: 2px solid var(--ink); padding-bottom: 4px; }
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); background: #fff; }
+.cell { padding: 10px 12px; border-right: 1px solid var(--line); min-width: 0; overflow-wrap: break-word; }
+.cell:last-child { border-right: 0; }
+.lbl { font: 600 11px system-ui, sans-serif; color: #6b625b; text-transform: uppercase; margin-bottom: 6px; }
+.rowlbl { grid-column: 1 / -1; background: #f3ede6; font: 600 12px system-ui; padding: 4px 12px; border-top: 1px solid var(--line); }
+.f-2006 { font-family: 'Noto-2006', sans-serif; }
+.f-2007 { font-family: 'Noto-2007', sans-serif; }
+.f-tiro { font-family: 'Tiro', serif; }
+.f-mukta { font-family: 'Mukta', sans-serif; }
+/* Same rules the site uses: no letter-spacing, default shaping, generous leading. */
+.cell > div { line-height: 1.5; }
+.w400 { font-weight: 400; } .w500 { font-weight: 500; } .w600 { font-weight: 600; } .w700 { font-weight: 700; }
+.size-big { font-size: 56px; line-height: 1.4; }
+.size-hl { font-size: 28px; line-height: 1.38; font-weight: 800; }
+.size-art { font-size: 18px; line-height: 1.82; }
+.size-mob { font-size: 15px; line-height: 1.7; }
+.mobile-frame .grid { grid-template-columns: repeat(4, 1fr); }
+.mobile-frame .cell { padding: 8px; }
+@media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<h1>Marathi typography comparison (development only)</h1>
+<p class="note">A = Noto Sans Devanagari 2.006 (previously committed) · B = Noto Sans Devanagari 2.007 (bundled now, identical shaping to the official release) · C = Tiro Devanagari Marathi (static, Regular only, so 500 to 700 are synthesised faux bold) · D = Mukta (static Regular/Medium/SemiBold/Bold). Open directly or via <code>node tools/typography-compare/serve.mjs</code>. Keep letter-spacing at 0 and never set font-feature-settings here.</p>
+<div id="root"></div>
+<script>
+const FAMS = [['f-2006','A · Noto 2.006'],['f-2007','B · Noto 2.007'],['f-tiro','C · Tiro Marathi'],['f-mukta','D · Mukta']];
+const WORDS = ['महाराष्ट्र','महाराष्ट्रातील','राष्ट्र','राष्ट्रवादी','उत्कृष्ट','दृष्टिकोन','श्री','प्रश्न','कर्मचारी','शिक्षण','संस्कृती','इचलकरंजी','कोल्हापूर','छत्रपती संभाजीनगर'];
+const PHRASES = ['महाराष्ट्र राज्यातील महत्त्वाच्या बातम्या','न्यायालयीन कर्मचाऱ्यांच्या बेमुदत संपास सुरुवात'];
+const WEIGHTS = [[400,'Regular'],[500,'Medium'],[600,'Semibold'],[700,'Bold']];
+const root = document.getElementById('root');
+const esc = s => s;
+function sec(title, body) { const s = document.createElement('section'); s.innerHTML = `<h2>${title}</h2>${body}`; root.appendChild(s); }
+function grid(sizeCls, text, weight) {
+  return `<div class="grid">` + FAMS.map(([f,l]) => `<div class="cell"><div class="lbl">${l}</div><div class="${f} ${sizeCls} ${weight ? 'w'+weight : ''}" lang="mr">${text}</div></div>`).join('') + `</div>`;
+}
+// 1. Test words at large size, Regular: character shape + conjunct formation
+sec('1. Test words, 56px Regular (conjunct formation, character shape)',
+  WORDS.map(w => `<div class="rowlbl">${w}</div>` + '').map((lbl,i)=> grid('size-big', WORDS[i], 400).replace('<div class="grid">', '<div class="grid">'+lbl)).join(''));
+// 2. Weights
+sec('2. Weights (Regular / Medium / Semibold / Bold) on the key conjunct words',
+  WEIGHTS.map(([w,n]) => `<div class="rowlbl" style="margin-top:8px">${n} (${w})</div>` + grid('size-hl', 'महाराष्ट्रातील राष्ट्रवादी उत्कृष्ट दृष्टिकोन', w)).join(''));
+// 3. Headline + article + mobile
+sec('3. Headline appearance, 28px weight 800 (site .hl). Tiro/Mukta fall back to nearest available weight.',
+  PHRASES.map(p => grid('size-hl', p)).join(''));
+sec('4. Article body, 18px / 1.82 line-height (site .entry-content), long-form reading',
+  grid('size-art', 'महाराष्ट्र राज्यातील महत्त्वाच्या बातम्या आज प्रसिद्ध झाल्या. कोल्हापूर आणि इचलकरंजी येथील शिक्षण व संस्कृती क्षेत्रातील कर्मचाऱ्यांच्या प्रश्नांवर राष्ट्रवादी पक्षाने आपला दृष्टिकोन स्पष्ट केला. छत्रपती संभाजीनगर येथे न्यायालयीन कर्मचाऱ्यांच्या बेमुदत संपास सुरुवात झाली असून उत्कृष्ट सेवेसाठी श्री. पाटील यांचा सत्कार करण्यात आला.'));
+sec('5. Small mobile size, 15px / 1.7',
+  '<div class="mobile-frame">' + grid('size-mob', 'न्यायालयीन कर्मचाऱ्यांच्या बेमुदत संपास सुरुवात · महाराष्ट्र राज्यातील महत्त्वाच्या बातम्या · राष्ट्रवादी दृष्टिकोन · उत्कृष्ट प्रश्न') + '</div>');
+</script>
+</body>
+</html>
