@@ -1,26 +1,23 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { Icon, type IconName } from './Icon';
-import { readableUrl, whatsappHref } from '@/lib/share';
+import { facebookHref, telegramHref, whatsappHref, xHref } from '@/lib/share';
 
 type Item = { name: string; label: string; icon: IconName; href: string };
 
 function items(url: string, title: string): Item[] {
-  const u = encodeURIComponent(url);
-  const t = encodeURIComponent(title);
   return [
     { name: 'WhatsApp', label: 'WhatsApp', icon: 'whatsapp', href: whatsappHref(title, url) },
-    { name: 'Facebook', label: 'Facebook', icon: 'facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${u}` },
-    { name: 'X', label: 'X', icon: 'x', href: `https://twitter.com/intent/tweet?text=${t}&url=${u}` },
-    { name: 'Telegram', label: 'Telegram', icon: 'telegram', href: `https://t.me/share/url?url=${u}&text=${t}` },
+    { name: 'Facebook', label: 'Facebook', icon: 'facebook', href: facebookHref(url) },
+    { name: 'X', label: 'X', icon: 'x', href: xHref(title, url) },
+    { name: 'Telegram', label: 'Telegram', icon: 'telegram', href: telegramHref(title, url) },
   ];
 }
-
 function useCopy(url: string) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
-  const text = readableUrl(url);
+  const text = url;
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(text);
