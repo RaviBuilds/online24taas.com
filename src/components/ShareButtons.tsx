@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { Icon, type IconName } from './Icon';
-import { facebookHref, telegramHref, whatsappHref, xHref } from '@/lib/share';
+import { facebookHref, readableUrl, telegramHref, whatsappHref, xHref } from '@/lib/share';
 
 type Item = { name: string; label: string; icon: IconName; href: string };
 
@@ -17,7 +17,7 @@ function useCopy(url: string) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
-  const text = url;
+  const text = readableUrl(url);
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(text);
