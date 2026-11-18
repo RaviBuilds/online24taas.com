@@ -7,7 +7,7 @@ import type { PostCardData } from '@/lib/data';
 import { decodeParam, authorPath, categoryPath, postPath, tagPath } from '@/lib/urls';
 import { formatDate } from '@/lib/format';
 import { slugTag } from '@/lib/cache-tags';
-import { buildMetadata, ogImageUrl, plainDescription } from '@/lib/seo';
+import { buildMetadata, ogImage, ogImageUrl, plainDescription } from '@/lib/seo';
 import { SITE_NAME, absoluteUrl } from '@/lib/site';
 import { CoverImage } from '@/components/CoverImage';
 import { PortableTextRenderer } from '@/components/PortableTextRenderer';
@@ -57,7 +57,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: post.seo?.seoTitle || post.title,
     description,
     path: postPath(post.slug),
-    image: ogImageUrl(post.seo?.ogRef || post.image?.ref),
+    // Priority: the article's featured image, then an editor-set social image, then the site default (inside buildMetadata).
+    image: ogImage(post.image?.ref) ?? ogImage(post.seo?.ogRef),
+    imageAlt: post.image?.alt || post.title,
     type: 'article',
     noIndex: post.seo?.noIndex,
     publishedTime: post.publishedAt,
